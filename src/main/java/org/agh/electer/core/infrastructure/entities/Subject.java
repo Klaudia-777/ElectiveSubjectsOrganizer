@@ -12,9 +12,8 @@ import javax.persistence.*;
 @Entity(name="SUBJECT_TABLE")
 public class Subject {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name= "SUBJECT_ID")
-    private int id;
+    private String id;
 
     @Column(name="SUBJECT_NAME")
     private String name;
@@ -28,7 +27,7 @@ public class Subject {
     @Column(name="DESCRIPTION")
     private String description;
 
-    @OneToMany(fetch= FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "subjectSet")
+    @OneToMany(fetch= FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "electiveSubjects")
     private SubjectSet subjectSet;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -12,9 +12,8 @@ import javax.persistence.*;
 @Entity(name = "SUBJECT_CHOICE_TABLE")
 public class SubjectChoice {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "SUBJECT_CHOICE_ID")
-    private int id;
+    private String id;
 
     @Column(name = "PRIORITY")
     private int priority;
