@@ -2,6 +2,7 @@ package org.agh.electer.core.infrastructure.entities;
 
 import lombok.*;
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @Builder
 
 @Entity(name="SUBJECT_TABLE")
-public class Subject {
+public class SubjectEntity {
     @Id
     @Column(name= "SUBJECT_ID")
     private String id;
@@ -27,10 +28,10 @@ public class Subject {
     @Column(name="DESCRIPTION")
     private String description;
 
-    @OneToMany(fetch= FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "electiveSubjects")
-    private SubjectSet subjectSet;
+    @ManyToOne(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
+    private SubjectPoolEntity subjectPool;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "subject")
     @JoinColumn(name = "SUBJECT_CHOICE_ID")
-    private SubjectChoice subjectChoice;
+    private List<SubjectChoiceEntity> subjectChoices;
 }

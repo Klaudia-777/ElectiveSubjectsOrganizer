@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 
 @Value
 @AllArgsConstructor(staticName = "of")
-public class SubjectId {
+public class SubjectChoiceId {
     @NotNull
     private String value;
 }

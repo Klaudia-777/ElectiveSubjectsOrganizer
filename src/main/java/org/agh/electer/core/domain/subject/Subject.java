@@ -2,15 +2,17 @@ package org.agh.electer.core.domain.subject;
 
 import lombok.Builder;
 import lombok.Data;
+import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @Builder
 public class Subject {
 
     @NotNull
-    private Id subjectId;
+    private SubjectId subjectId;
 
     @NotNull
     private Name name;
@@ -22,12 +24,7 @@ public class Subject {
     private NoPlaces numberOfPlaces;
 
     @NotNull
+    private List<SubjectChoice> subjectChoices;
+
     private Description description;
-
-    @NotNull
-    private SubjectSetId subjectSet;
-
-    @NotNull
-    private SubjectChoiceId subjectChoice;
-
 }

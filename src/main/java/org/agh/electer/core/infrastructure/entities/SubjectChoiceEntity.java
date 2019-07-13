@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Builder
 
 @Entity(name = "SUBJECT_CHOICE_TABLE")
-public class SubjectChoice {
+public class SubjectChoiceEntity {
     @Id
     @Column(name = "SUBJECT_CHOICE_ID")
     private String id;
@@ -18,11 +18,10 @@ public class SubjectChoice {
     @Column(name = "PRIORITY")
     private int priority;
 
-
-    @OneToMany(fetch= FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "subjectChoice")
-    private Subject subject;
+    @ManyToOne(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
+    private SubjectEntity subject;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "STUDENT_ID")
-    private Student student;
+    private StudentEntity student;
 }
