@@ -10,8 +10,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 
-@Entity(name="SUBJECT_SET_TABLE")
-public class SubjectSet {
+@Entity(name="SUBJECT_POOL_TABLE")
+public class SubjectPoolEntity {
     @Id
     @Column(name="SUBJECT_SET_ID")
     private String id;
@@ -21,5 +21,5 @@ public class SubjectSet {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "SUBJECT_ID")
-    private Set<Subject> electiveSubjects;
+    private Set<SubjectEntity> electiveSubjects;
 }

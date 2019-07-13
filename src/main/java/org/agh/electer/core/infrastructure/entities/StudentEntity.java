@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 
-public class Student {
+public class StudentEntity {
 
     @Id
     @Column(name="NO_ALBUM")
@@ -42,6 +42,6 @@ public class Student {
     private double averageGrade;
 
     @OneToMany(fetch= FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "student")
-    private List<SubjectChoice> subjectChoices;
+    private List<SubjectChoiceEntity> subjectChoices;
 
 }
