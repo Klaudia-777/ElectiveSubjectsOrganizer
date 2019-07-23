@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class StudentMapper {
-    public StudentEntity toEntity(final Student student, final Function<String,SubjectChoiceEntity> subjectChoiceEntityFunction) {
+    public StudentEntity toEntity(final Student student) {
         val entity = StudentEntity.builder()
                 .albumNumber(student.getAlbumNumber().getValue())
                 .Name(student.getName().getValue())
@@ -27,37 +27,14 @@ public class StudentMapper {
                 .averageGrade(student.getAverageGrade().getValue())
                 .studentsRole(student.getStudentsRole())
                 .studiesDegree(student.getStudiesDegree())
-                .subjectChoices(student.getSubjectChoices().keySet()
-                        .stream()
-                        .map(SubjectId::getValue)
-                        .map(subjectChoiceEntityFunction)
-                        .collect(Collectors.toList()))
                 .build();
 
-
+        val choices = student.getSubjectChoices().stream().map(subjectChoice ->
+                SubjectChoiceMapper.toEntity(subjectChoice, entity)).collect(Collectors.toList());
+        entity.setSubjectChoices(choices);
         return entity;
     }
 
-//    public static SubjectEntity toEntity(Subject subjectDomain) {
-//        return SubjectEntity.builder()
-//                .id(subjectDomain.getSubjectId().getValue())
-//                .description(subjectDomain.getDescription().getValue())
-//                .tutor(subjectDomain.getTutor().getValue())
-//                .numberOfPlaces(subjectDomain.getNumberOfPlaces().getValue())
-//                .name(subjectDomain.getName().getValue())
-//                .;
-//    }
-
-
-//    public static SubjectChoiceEntity toEntity(final SubjectChoice subjectChoice, StudentEntity studentEntity, SubjectEntity subjectEntity){
-//        val entity = SubjectChoiceEntity.builder()
-//                .id(subjectChoice.getId().getValue())
-//                .priority(subjectChoice.getPriority().getValue())
-//                .studentId(studentEntity.getAlbumNumber())
-//                .subject(subjectEntity)
-//                .build();
-//        return entity;
-//    }
 
     public Student toDomain(final StudentEntity studentEntity) {
         val student = Student.builder()
@@ -70,9 +47,9 @@ public class StudentMapper {
                 .averageGrade(AverageGrade.of(studentEntity.getAverageGrade()))
                 .studentsRole(studentEntity.getStudentsRole())
                 .studiesDegree(studentEntity.getStudiesDegree())
-                .subjectChoices(studentEntity.getSubjectChoices()
-                        .stream()
-                        .collect(Collectors.toMap(s->SubjectChoiceId.of(s.getId()),s-> Priority.of(s.getPriority()))))
+                .subjectChoices(studentEntity.getSubjectChoices().stream()
+                        .map(SubjectChoiceMapper::toDomain)
+                        .collect(Collectors.toList()))
                 .build();
         return student;
     }

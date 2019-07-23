@@ -15,6 +15,8 @@ import org.agh.electer.core.infrastructure.entities.SubjectChoiceEntity;
 import org.agh.electer.core.infrastructure.entities.SubjectEntity;
 import org.agh.electer.core.infrastructure.entities.SubjectPoolEntity;
 
+import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @UtilityClass
@@ -40,57 +42,30 @@ public class SubjectPoolMapper {
                 .subjectPool(subjectPoolEntity)
                 .build();
 
-        val subjectChoicesEntity = subject.getSubjectChoices()
-                .stream()
-                .map(s -> toSubjectChoiceEntity(s,  subjectEntity))
-                .collect(Collectors.toList());
-        subjectEntity.setSubjectChoices(subjectChoicesEntity);
         return subjectEntity;
     }
 
 
-    private SubjectChoiceEntity toSubjectChoiceEntity(final SubjectChoice subjectChoice,
-                                                      final SubjectEntity subjectEntity) {
-
-        return SubjectChoiceEntity.builder()
-                .id(subjectChoice.getId().getValue())
-                .priority(subjectChoice.getPriority().getValue())
-                .studentId(subjectChoice.getStudent().getValue())
-                .subject(subjectEntity)
-                .build();
-    }
-
-    public static SubjectPool toDomain(SubjectPoolEntity s) {
+    public static SubjectPool toDomain(SubjectPoolEntity s, final Function<String, List<SubjectChoice>> subjectChoiceSelector) {
         return SubjectPool.builder()
                 .id(SubjectPoolId.of(s.getId()))
                 .fieldOfStudy(s.getFieldOfStudy())
                 .noSubjectsToAttend(NoSubjectsToAttend.of(s.getNumberOfSubjectsToAttend()))
                 .electiveSubjects(s.getElectiveSubjects()
                         .stream()
-                        .map(SubjectPoolMapper::toDomain)
+                        .map(subjectEntity -> toDomain(subjectEntity, subjectChoiceSelector))
                         .collect(Collectors.toSet())
                 ).build();
     }
 
-    private static Subject toDomain(SubjectEntity subjectEntity) {
+    private static Subject toDomain(SubjectEntity subjectEntity, final Function<String, List<SubjectChoice>> subjectChoiceSelector) {
         return Subject.builder()
                 .subjectId(SubjectId.of(subjectEntity.getId()))
                 .name(Name.of(subjectEntity.getName()))
                 .description(Description.of(subjectEntity.getDescription()))
                 .numberOfPlaces(NoPlaces.of(subjectEntity.getNumberOfPlaces()))
                 .tutor(Tutor.of(subjectEntity.getTutor()))
-                .subjectChoices(subjectEntity.getSubjectChoices()
-                        .stream()
-                        .map(SubjectPoolMapper::toDomain)
-                        .collect(Collectors.toList()))
-                .build();
-    }
-
-    private static SubjectChoice toDomain(SubjectChoiceEntity subjectChoiceEntity) {
-        return SubjectChoice.builder()
-                .id(SubjectChoiceId.of(subjectChoiceEntity.getId()))
-                .priority(Priority.of(subjectChoiceEntity.getPriority()))
-                .student(AlbumNumber.of(subjectChoiceEntity.getStudentId()))
+                .subjectChoices(subjectChoiceSelector.apply(subjectEntity.getId()))
                 .build();
     }
 
