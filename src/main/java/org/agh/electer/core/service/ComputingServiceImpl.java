@@ -39,11 +39,35 @@ public class ComputingServiceImpl implements ComputingService {
                     .map(SubjectChoice::getStudent)
                     .collect(Collectors.toMap(Function.identity(), id -> studentRepository.findById(id).get()));
 
-            List<Student> studentSList= new ArrayList<>(studentMap.values());
 
-            for (val student:studentSList) {
-                if(student.getStudentsRole().equals(StudentsRole.YearGroupRepresentative)){
+            // Lista studentow ktorzy dokonywali wyborow
 
+            List<Student> studentSList = new ArrayList<>(studentMap.values());
+
+            // iteracja po liscie studentow w celu wylonienia starosty
+            // i ustawienia mu przedmiotow jak chce ...
+
+            for (val student : studentSList) {
+                AlbumNumber albumNumber = student.getAlbumNumber();
+
+                // ---> jesli dany student jest starosta...
+
+                if (student.getStudentsRole().equals(StudentsRole.YearGroupRepresentative)) {
+
+                    // ---> to jesli wybral ten przedmiot z priorytetem <= liczbie przedmiotow na jakie musi uczeszczac...
+
+                    if (subjectPoolRepository.findById(subjectPoolId).get().getNoSubjectsToAttend().getValue() >=
+                            student.getSubjectChoices().get(subject.getSubjectId()).getValue()) {
+
+                        // ---> to dodajemy go do listy zakwalifikowanych...
+                        studentsQualifiedForThisSubject.add(albumNumber);
+                    }
+
+                    // ---> niezaleznie jaki byl priorytet usuwamy staroste z mapy
+                    // (albo jest juz zapisany albo nie chcial byc)
+                    //  tak czy ta nie bierzemy go pod uwage w dalszych zapisach
+                    
+                    studentMap.remove(albumNumber);
                 }
             }
 
