@@ -12,14 +12,14 @@ public class SubjectChoice {
     @NotNull
     private SubjectChoiceId id;
 
-    public Priority getPriority() {
-        return priority;
-    }
-
     @NotNull
     private Priority priority;
 
     @NotNull
     private AlbumNumber student;
+
+    public Priority getPriority() {
+        return priority;
+    }
 
 }

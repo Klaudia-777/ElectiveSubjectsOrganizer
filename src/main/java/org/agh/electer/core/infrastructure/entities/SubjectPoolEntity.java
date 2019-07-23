@@ -22,4 +22,8 @@ public class SubjectPoolEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "SUBJECT_ID")
     private Set<SubjectEntity> electiveSubjects;
+
+    @Column(name = "NUMBER_OF_SUBJECTS_TO_ATTEND")
+    private int numberOfSubjectsToAttend;
+
 }

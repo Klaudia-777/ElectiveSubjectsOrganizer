@@ -1,6 +1,7 @@
 package org.agh.electer.core.infrastructure.entities;
 
 import lombok.*;
+
 import javax.persistence.*;
 
 @Getter
@@ -18,10 +19,12 @@ public class SubjectChoiceEntity {
     @Column(name = "PRIORITY")
     private int priority;
 
-    @ManyToOne(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private SubjectEntity subject;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "STUDENT_ID")
-    private StudentEntity student;
+//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    @JoinColumn(name = "STUDENT_ID")
+//    private StudentEntity student;
+
+    private String studentId;
 }

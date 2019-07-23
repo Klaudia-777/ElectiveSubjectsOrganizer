@@ -6,6 +6,7 @@ import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.domain.subject.pool.SubjectPoolId;
+import org.agh.electer.core.infrastructure.entities.StudentsRole;
 import org.agh.electer.core.infrastructure.repositories.StudentRepository;
 import org.agh.electer.core.infrastructure.repositories.SubjectPoolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,14 @@ public class ComputingServiceImpl implements ComputingService {
             studentMap = subject.getSubjectChoices().stream()
                     .map(SubjectChoice::getStudent)
                     .collect(Collectors.toMap(Function.identity(), id -> studentRepository.findById(id).get()));
+
+            List<Student> studentSList= new ArrayList<>(studentMap.values());
+
+            for (val student:studentSList) {
+                if(student.getStudentsRole().equals(StudentsRole.YearGroupRepresentative)){
+
+                }
+            }
 
             List<SubjectChoice> subjectChoicesByPriorityAndAvg = subject.getSubjectChoices()
                     .stream()
