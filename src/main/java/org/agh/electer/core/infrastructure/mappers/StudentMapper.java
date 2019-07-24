@@ -3,10 +3,8 @@ package org.agh.electer.core.infrastructure.mappers;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import org.agh.electer.core.domain.student.*;
-import org.agh.electer.core.domain.subject.Subject;
 import org.agh.electer.core.domain.subject.SubjectId;
 import org.agh.electer.core.domain.subject.choice.Priority;
-import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.infrastructure.entities.*;
 

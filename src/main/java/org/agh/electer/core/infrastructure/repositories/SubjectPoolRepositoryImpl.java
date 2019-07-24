@@ -66,7 +66,7 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
     }
 
     //todo change to sql query
-    private List<SubjectChoice> selectSubjectChoicesForSubject(String subjectId) {
+    public List<SubjectChoice> selectSubjectChoicesForSubject(String subjectId) {
         return StreamSupport.stream(subjectChoiceDao.findAll().spliterator(), false)
                 .filter(s -> s.getSubjectId().equals(subjectId))
                 .map(SubjectChoiceMapper::toDomain)

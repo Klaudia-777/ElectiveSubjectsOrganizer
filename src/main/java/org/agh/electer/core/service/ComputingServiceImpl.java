@@ -8,6 +8,7 @@ import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.domain.subject.pool.SubjectPoolId;
 import org.agh.electer.core.infrastructure.entities.StudentsRole;
 import org.agh.electer.core.infrastructure.repositories.StudentRepository;
+import org.agh.electer.core.infrastructure.repositories.SubjectChoiceRepository;
 import org.agh.electer.core.infrastructure.repositories.SubjectPoolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,23 +21,28 @@ import java.util.stream.Collectors;
 public class ComputingServiceImpl implements ComputingService {
     private final SubjectPoolRepository subjectPoolRepository;
     private final StudentRepository studentRepository;
+    private final SubjectChoiceRepository subjectChoiceRepository;
 
     private Map<AlbumNumber, Student> studentMap;
     private Map<SubjectChoiceId, Optional<SubjectChoice>> subjectChoiceMap;
 
     @Autowired
-    public ComputingServiceImpl(SubjectPoolRepository subjectPoolRepository, StudentRepository studentRepository) {
+    public ComputingServiceImpl(SubjectPoolRepository subjectPoolRepository, StudentRepository studentRepository, SubjectChoiceRepository subjectChoiceRepository) {
         this.subjectPoolRepository = subjectPoolRepository;
         this.studentRepository = studentRepository;
+        this.subjectChoiceRepository = subjectChoiceRepository;
     }
 
     @Override
     public void compute(SubjectPoolId subjectPoolId) {
-        for (val subject : subjectPoolRepository.findById(subjectPoolId).get().getElectiveSubjects()) {
+        val subjectPool = subjectPoolRepository.findById(subjectPoolId).get();
+
+        for (val subject : subjectPool.getElectiveSubjects()) {
             List<AlbumNumber> studentsQualifiedForThisSubject = new ArrayList<>();
 
-            studentMap = subject.getSubjectChoices().stream()
-                    .map(SubjectChoice::getStudent)
+            studentMap = subjectPoolRepository.selectSubjectChoicesForSubject(subject.getSubjectId().getValue())
+                    .stream()
+                    .map(SubjectChoice::getStudentId)
                     .collect(Collectors.toMap(Function.identity(), id -> studentRepository.findById(id).get()));
 
 
@@ -56,23 +62,25 @@ public class ComputingServiceImpl implements ComputingService {
 
                     // ---> to jesli wybral ten przedmiot z priorytetem <= liczbie przedmiotow na jakie musi uczeszczac...
 
-                    if (subjectPoolRepository.findById(subjectPoolId).get().getNoSubjectsToAttend().getValue() >=
-                            student.getSubjectChoices().get(subject.getSubjectId()).getValue()) {
+                    if (subjectPool.getNoSubjectsToAttend().getValue() >=
+                            student.getSubjectChoicePriority(subject.getSubjectId()).getValue()) {
 
                         // ---> to dodajemy go do listy zakwalifikowanych...
                         studentsQualifiedForThisSubject.add(albumNumber);
+                        subject.decreaseNoPlaces();
                     }
 
                     // ---> niezaleznie jaki byl priorytet usuwamy staroste z mapy
                     // (albo jest juz zapisany albo nie chcial byc)
-                    //  tak czy ta nie bierzemy go pod uwage w dalszych zapisach
-                    
+                    //  tak czy tak nie bierzemy go pod uwage w dalszych zapisach
+
                     studentMap.remove(albumNumber);
                 }
             }
 
-            List<SubjectChoice> subjectChoicesByPriorityAndAvg = subject.getSubjectChoices()
+            List<SubjectChoice> subjectChoicesByPriorityAndAvg = studentMap.values()
                     .stream()
+                    .map(student -> student.findSubjectChoiceBySubjectId(subject.getSubjectId()))
                     .sorted(compareByPriority()
                             .thenComparing(compareByAgerageGrade()))
                     .collect(Collectors.toList());
@@ -80,7 +88,7 @@ public class ComputingServiceImpl implements ComputingService {
             int sinceWhichIndex = 0;
             for (int i = 0; i < subject.getNumberOfPlaces().getValue(); i++) {
                 if (i <= subjectChoicesByPriorityAndAvg.size()) {
-                    studentsQualifiedForThisSubject.add(subjectChoicesByPriorityAndAvg.get(i).getStudent());
+                    studentsQualifiedForThisSubject.add(subjectChoicesByPriorityAndAvg.get(i).getStudentId());
                 } else {
                     sinceWhichIndex = i;
                     studentMap.values().forEach(student -> student.deleteSubjectChoice(subject.getSubjectId()));
@@ -91,7 +99,7 @@ public class ComputingServiceImpl implements ComputingService {
 
             for (int i = sinceWhichIndex; i < subjectChoicesByPriorityAndAvg.size(); i++) {
                 val subjectchoice = subjectChoicesByPriorityAndAvg.get(i);
-                studentMap.get(subjectchoice.getStudent()).decreasePriority();
+                studentMap.get(subjectchoice.getStudentId()).decreasePriority();
             }
 
 
@@ -103,6 +111,6 @@ public class ComputingServiceImpl implements ComputingService {
     }
 
     private Comparator<SubjectChoice> compareByAgerageGrade() {
-        return Comparator.comparing(s -> studentRepository.findById(s.getStudent()).get().getAverageGrade().getValue());
+        return Comparator.comparing(s -> studentMap.get(s.getStudentId()).getAverageGrade().getValue());
     }
 }

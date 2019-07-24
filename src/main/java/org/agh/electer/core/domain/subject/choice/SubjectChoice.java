@@ -19,6 +19,9 @@ public class SubjectChoice {
     @NotNull
     private SubjectId subjectId;
 
+    @NotNull
+    private AlbumNumber studentId;
+
     public Priority getPriority() {
         return priority;
     }

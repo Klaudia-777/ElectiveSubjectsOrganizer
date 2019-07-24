@@ -54,6 +54,14 @@ public class Student {
     }
 
     public void decreasePriority() {
-       subjectChoices.forEach(s->s.setPriority(Priority.of(s.getPriority().getValue()-1)));
+        subjectChoices.forEach(s -> s.setPriority(Priority.of(s.getPriority().getValue() - 1)));
     }
+
+    public SubjectChoice findSubjectChoiceBySubjectId(SubjectId subjectId) {
+        return subjectChoices.stream().filter(sc -> sc.getSubjectId().equals(subjectId)).findFirst().orElse(null);
+    }
+    public Priority getSubjectChoicePriority(SubjectId subjectId){
+        return findSubjectChoiceBySubjectId(subjectId).getPriority();
+    }
+
 }

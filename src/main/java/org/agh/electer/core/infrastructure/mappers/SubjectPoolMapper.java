@@ -65,7 +65,14 @@ public class SubjectPoolMapper {
                 .description(Description.of(subjectEntity.getDescription()))
                 .numberOfPlaces(NoPlaces.of(subjectEntity.getNumberOfPlaces()))
                 .tutor(Tutor.of(subjectEntity.getTutor()))
-                .subjectChoices(subjectChoiceSelector.apply(subjectEntity.getId()))
+                .qualifiedStudents(subjectEntity.getQualifiedStudents()
+                        .stream()
+                        .map(StudentMapper::toDomain)
+                        .collect(Collectors.toList()))
+//                .subjectChoices(subjectEntity.
+//                .stream()
+//                .map(SubjectPoolMapper::toDomain)
+//                .collect(Collectors.toList()))
                 .build();
     }
 

@@ -3,7 +3,6 @@ package org.agh.electer.core.infrastructure.repositories;
 import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.infrastructure.dao.StudentDao;
-import org.agh.electer.core.infrastructure.dao.SubjectChoiceDao;
 import org.agh.electer.core.infrastructure.mappers.StudentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -23,7 +22,7 @@ public class StudentRepositoryImpl implements StudentRepository {
     @Override
     public Optional<Student> findById(AlbumNumber albumNumber) {
         return studentDao.findById(albumNumber.getValue())
-                .map(e -> StudentMapper.toDomain(e));
+                .map(StudentMapper::toDomain);
     }
 
     @Override
