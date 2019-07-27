@@ -2,6 +2,7 @@ package org.agh.electer.core.domain.subject;
 
 import lombok.Builder;
 import lombok.Data;
+import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 
 import javax.validation.constraints.NotNull;
@@ -27,4 +28,10 @@ public class Subject {
     private List<SubjectChoice> subjectChoices;
 
     private Description description;
+
+    private List<Student> qualifiedStudents;
+
+    public void decreaseNoPlaces() {
+        numberOfPlaces = NoPlaces.of(numberOfPlaces.getValue() - 1);
+    }
 }

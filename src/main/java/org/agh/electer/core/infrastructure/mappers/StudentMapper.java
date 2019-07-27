@@ -3,10 +3,12 @@ package org.agh.electer.core.infrastructure.mappers;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import org.agh.electer.core.domain.student.*;
+import org.agh.electer.core.domain.subject.SubjectId;
 import org.agh.electer.core.domain.subject.choice.Priority;
 import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.infrastructure.entities.*;
 
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -23,12 +25,14 @@ public class StudentMapper {
                 .averageGrade(student.getAverageGrade().getValue())
                 .studentsRole(student.getStudentsRole())
                 .studiesDegree(student.getStudiesDegree())
-                .subjectChoices(student.getSubjectChoices().keySet())
                 .build();
 
-
+        val choices = student.getSubjectChoices().stream().map(subjectChoice ->
+                SubjectChoiceMapper.toEntity(subjectChoice, entity)).collect(Collectors.toList());
+        entity.setSubjectChoices(choices);
         return entity;
     }
+
 
     public Student toDomain(final StudentEntity studentEntity) {
         val student = Student.builder()
@@ -41,9 +45,9 @@ public class StudentMapper {
                 .averageGrade(AverageGrade.of(studentEntity.getAverageGrade()))
                 .studentsRole(studentEntity.getStudentsRole())
                 .studiesDegree(studentEntity.getStudiesDegree())
-                .subjectChoices(studentEntity.getSubjectChoices()
-                        .stream()
-                        .collect(Collectors.toMap(s->SubjectChoiceId.of(s.getId()),s-> Priority.of(s.getPriority()))))
+                .subjectChoices(studentEntity.getSubjectChoices().stream()
+                        .map(SubjectChoiceMapper::toDomain)
+                        .collect(Collectors.toList()))
                 .build();
         return student;
     }

@@ -43,7 +43,7 @@ public class Student {
     private NoSemester numberOfSemester;
 
     @NotNull
-    private Map<SubjectId, Priority> subjectChoices;
+    private List<SubjectChoice> subjectChoices;
 
     private AverageGrade averageGrade;
 
@@ -54,7 +54,14 @@ public class Student {
     }
 
     public void decreasePriority() {
-       subjectChoices = subjectChoices.entrySet().stream()
-               .collect(Collectors.toMap(Map.Entry::getKey, entry->Priority.of(entry.getValue().getValue()-1)));
+        subjectChoices.forEach(s -> s.setPriority(Priority.of(s.getPriority().getValue() - 1)));
     }
+
+    public SubjectChoice findSubjectChoiceBySubjectId(SubjectId subjectId) {
+        return subjectChoices.stream().filter(sc -> sc.getSubjectId().equals(subjectId)).findFirst().orElse(null);
+    }
+    public Priority getSubjectChoicePriority(SubjectId subjectId){
+        return findSubjectChoiceBySubjectId(subjectId).getPriority();
+    }
+
 }

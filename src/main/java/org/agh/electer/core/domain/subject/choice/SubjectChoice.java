@@ -3,6 +3,7 @@ package org.agh.electer.core.domain.subject.choice;
 import lombok.Builder;
 import lombok.Data;
 import org.agh.electer.core.domain.student.AlbumNumber;
+import org.agh.electer.core.domain.subject.SubjectId;
 
 import javax.validation.constraints.NotNull;
 
@@ -12,14 +13,17 @@ public class SubjectChoice {
     @NotNull
     private SubjectChoiceId id;
 
-    public Priority getPriority() {
-        return priority;
-    }
-
     @NotNull
     private Priority priority;
 
     @NotNull
-    private AlbumNumber student;
+    private SubjectId subjectId;
+
+    @NotNull
+    private AlbumNumber studentId;
+
+    public Priority getPriority() {
+        return priority;
+    }
 
 }

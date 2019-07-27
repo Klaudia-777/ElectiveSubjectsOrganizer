@@ -31,7 +31,7 @@ public class SubjectEntity {
     @ManyToOne(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
     private SubjectPoolEntity subjectPool;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "subject")
-    @JoinColumn(name = "SUBJECT_CHOICE_ID")
-    private List<SubjectChoiceEntity> subjectChoices;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "subject")
+    @JoinColumn(name = "QUALIFIED_STUDENTS")
+    private List<StudentEntity> qualifiedStudents;
 }

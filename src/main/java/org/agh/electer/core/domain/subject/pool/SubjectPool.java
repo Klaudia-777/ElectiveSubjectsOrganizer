@@ -19,4 +19,7 @@ public class SubjectPool {
 
     @NotNull
     private Set<Subject> electiveSubjects;
+
+    @NotNull
+    private NoSubjectsToAttend noSubjectsToAttend;
 }

@@ -22,7 +22,7 @@ public class StudentRepositoryImpl implements StudentRepository {
     @Override
     public Optional<Student> findById(AlbumNumber albumNumber) {
         return studentDao.findById(albumNumber.getValue())
-                .map(e -> StudentMapper.toDomain(e));
+                .map(StudentMapper::toDomain);
     }
 
     @Override
