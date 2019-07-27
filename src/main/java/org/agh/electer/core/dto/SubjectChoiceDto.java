@@ -2,10 +2,7 @@ package org.agh.electer.core.dto;
 
 import lombok.*;
 
-@AllArgsConstructor(staticName = "of")
-@Getter
-@NoArgsConstructor
-@Setter
+@Data
 @Builder
 public class SubjectChoiceDto {
     private String id;

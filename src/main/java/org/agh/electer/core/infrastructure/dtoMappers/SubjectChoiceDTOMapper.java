@@ -1,26 +1,30 @@
 package org.agh.electer.core.infrastructure.dtoMappers;
 
 import lombok.val;
+import org.agh.electer.core.domain.student.AlbumNumber;
+import org.agh.electer.core.domain.subject.SubjectId;
+import org.agh.electer.core.domain.subject.choice.Priority;
+import org.agh.electer.core.domain.subject.choice.SubjectChoice;
+import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.dto.SubjectChoiceDto;
-import org.agh.electer.core.infrastructure.entities.SubjectChoiceEntity;
 
 public class SubjectChoiceDTOMapper {
-    public static SubjectChoiceEntity toEntity(final SubjectChoiceDto dto) {
-        val entity = SubjectChoiceEntity.builder()
-                .id(dto.getId())
-                .priority(dto.getPriority())
-                .studentId(dto.getStudentId())
-                .subjectId(dto.getSubjectId())
+    public static SubjectChoice toDomain(final SubjectChoiceDto dto) {
+        val domain = SubjectChoice.builder()
+                .id(SubjectChoiceId.of(dto.getId()))
+                .priority(Priority.of(dto.getPriority()))
+                .studentId(AlbumNumber.of(dto.getStudentId()))
+                .subjectId(SubjectId.of(dto.getSubjectId()))
                 .build();
-        return entity;
+        return domain;
     }
 
-    public static SubjectChoiceDto toDto(final SubjectChoiceEntity entity) {
+    public static SubjectChoiceDto toDto(final SubjectChoice domain) {
         return SubjectChoiceDto.builder()
-                .id(entity.getSubjectId())
-                .priority(entity.getPriority())
-                .studentId(entity.getStudentId())
-                .subjectId(entity.getSubjectId())
+                .id(domain.getSubjectId().getValue())
+                .priority(domain.getPriority().getValue())
+                .studentId(domain.getStudentId().getValue())
+                .subjectId(domain.getSubjectId().getValue())
                 .build();
     }
 }

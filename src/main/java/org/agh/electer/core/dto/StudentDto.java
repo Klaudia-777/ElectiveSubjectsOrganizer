@@ -7,10 +7,7 @@ import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 
 import java.util.List;
 
-@AllArgsConstructor(staticName = "of")
-@Getter
-@NoArgsConstructor
-@Setter
+@Data
 @Builder
 public class StudentDto {
     private String albumNumber;

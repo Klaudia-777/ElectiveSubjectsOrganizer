@@ -3,8 +3,10 @@ package org.agh.electer.core.service;
 import lombok.val;
 import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.student.Student;
+import org.agh.electer.core.domain.subject.Subject;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
+import org.agh.electer.core.domain.subject.pool.SubjectPool;
 import org.agh.electer.core.domain.subject.pool.SubjectPoolId;
 import org.agh.electer.core.infrastructure.entities.StudentsRole;
 import org.agh.electer.core.infrastructure.repositories.StudentRepository;
@@ -47,37 +49,13 @@ public class ComputingServiceImpl implements ComputingService {
 
 
             // Lista studentow ktorzy dokonywali wyborow
-
             List<Student> studentSList = new ArrayList<>(studentMap.values());
 
             // iteracja po liscie studentow w celu wylonienia starosty
             // i ustawienia mu przedmiotow jak chce ...
+            setRepresentativesChoices(subjectPool, subject, studentsQualifiedForThisSubject, studentSList);
 
-            for (val student : studentSList) {
-                AlbumNumber albumNumber = student.getAlbumNumber();
-
-                // ---> jesli dany student jest starosta...
-
-                if (student.getStudentsRole().equals(StudentsRole.YearGroupRepresentative)) {
-
-                    // ---> to jesli wybral ten przedmiot z priorytetem <= liczbie przedmiotow na jakie musi uczeszczac...
-
-                    if (subjectPool.getNoSubjectsToAttend().getValue() >=
-                            student.getSubjectChoicePriority(subject.getSubjectId()).getValue()) {
-
-                        // ---> to dodajemy go do listy zakwalifikowanych...
-                        studentsQualifiedForThisSubject.add(albumNumber);
-                        subject.decreaseNoPlaces();
-                    }
-
-                    // ---> niezaleznie jaki byl priorytet usuwamy staroste z mapy
-                    // (albo jest juz zapisany albo nie chcial byc)
-                    //  tak czy tak nie bierzemy go pod uwage w dalszych zapisach
-
-                    studentMap.remove(albumNumber);
-                }
-            }
-
+            //ustawienie kolejki do przedmiotu
             List<SubjectChoice> subjectChoicesByPriorityAndAvg = studentMap.values()
                     .stream()
                     .map(student -> student.findSubjectChoiceBySubjectId(subject.getSubjectId()))
@@ -85,6 +63,9 @@ public class ComputingServiceImpl implements ComputingService {
                             .thenComparing(compareByAgerageGrade()))
                     .collect(Collectors.toList());
 
+            //wpisanie do przedmiotu zakwalifikowanych osob
+            //i obnizenie priorytetow + usuniecie wyborow niezakwalifikowanych
+            //poczawszy od indeksu:
             int sinceWhichIndex = 0;
             for (int i = 0; i < subject.getNumberOfPlaces().getValue(); i++) {
                 if (i <= subjectChoicesByPriorityAndAvg.size()) {
@@ -103,6 +84,33 @@ public class ComputingServiceImpl implements ComputingService {
             }
 
 
+        }
+    }
+
+    private void setRepresentativesChoices(SubjectPool subjectPool,
+                                           Subject subject,
+                                           List<AlbumNumber> studentsQualifiedForThisSubject,
+                                           List<Student> allStudentSList) {
+        for (val student : allStudentSList) {
+            AlbumNumber albumNumber = student.getAlbumNumber();
+
+            // ---> jesli dany student jest starosta...
+            if (student.getStudentsRole().equals(StudentsRole.YearGroupRepresentative)) {
+
+                // ---> to jesli wybral ten przedmiot z priorytetem <= liczbie przedmiotow na jakie musi uczeszczac...
+                if (subjectPool.getNoSubjectsToAttend().getValue() >=
+                        student.getSubjectChoicePriority(subject.getSubjectId()).getValue()) {
+
+                    // ---> to dodajemy go do listy zakwalifikowanych...
+                    studentsQualifiedForThisSubject.add(albumNumber);
+                    subject.decreaseNoPlaces();
+                }
+
+                // ---> niezaleznie jaki byl priorytet usuwamy staroste z mapy
+                // (albo jest juz zapisany albo nie chcial byc)
+                //  tak czy tak nie bierzemy go pod uwage w dalszych zapisach
+                studentMap.remove(albumNumber);
+            }
         }
     }
 

@@ -1,13 +1,11 @@
 package org.agh.electer.core.dto;
 
 import lombok.*;
+import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 
 import java.util.List;
 
-@AllArgsConstructor(staticName = "of")
-@Getter
-@NoArgsConstructor
-@Setter
+@Data
 @Builder
 public class SubjectDto {
     private String id;
@@ -15,6 +13,6 @@ public class SubjectDto {
     private String tutor;
     private int numberOfPlaces;
     private String description;
-    private SubjectPoolDto subjectPool;
+    private List<SubjectChoiceDto> subjectChoices;
     private List<StudentDto> qualifiedStudents;
 }

@@ -5,10 +5,7 @@ import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
 
 import java.util.Set;
 
-@AllArgsConstructor(staticName = "of")
-@Getter
-@NoArgsConstructor
-@Setter
+@Data
 @Builder
 public class SubjectPoolDto {
     private String id;
