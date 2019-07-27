@@ -18,8 +18,8 @@ public class SubjectDTOMapper {
                 .numberOfPlaces(NoPlaces.of(dto.getNumberOfPlaces()))
                 .build();
 
-        mapList(dto.getQualifiedStudents(),StudentDTOMapper::toDomain);
-        mapList(dto.getSubjectChoices(),SubjectChoiceDTOMapper::toDomain);
+        domain.setQualifiedStudents(mapList(dto.getQualifiedStudents(),StudentDTOMapper::toDomain));
+        domain.setSubjectChoices(mapList(dto.getSubjectChoices(),SubjectChoiceDTOMapper::toDomain));
 
         return domain;
     }
@@ -33,8 +33,8 @@ public class SubjectDTOMapper {
                 .numberOfPlaces(domain.getNumberOfPlaces().getValue())
                 .build();
 
-        mapList(domain.getQualifiedStudents(),StudentDTOMapper::toDto);
-        mapList(domain.getSubjectChoices(),SubjectChoiceDTOMapper::toDto);
+        dto.setQualifiedStudents(mapList(domain.getQualifiedStudents(),StudentDTOMapper::toDto));
+        dto.setSubjectChoices(mapList(domain.getSubjectChoices(),SubjectChoiceDTOMapper::toDto));
 
         return dto;
     }
