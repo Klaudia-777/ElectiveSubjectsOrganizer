@@ -9,4 +9,5 @@ public class SubjectChoiceDto {
     private int priority;
     private String studentId;
     private String subjectId;
+    private boolean qualifiedOrNot;
 }

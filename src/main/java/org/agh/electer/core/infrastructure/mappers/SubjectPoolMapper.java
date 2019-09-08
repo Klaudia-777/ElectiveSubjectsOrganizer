@@ -14,18 +14,24 @@ import org.agh.electer.core.infrastructure.entities.StudentEntity;
 import org.agh.electer.core.infrastructure.entities.SubjectChoiceEntity;
 import org.agh.electer.core.infrastructure.entities.SubjectEntity;
 import org.agh.electer.core.infrastructure.entities.SubjectPoolEntity;
+import org.agh.electer.core.infrastructure.repositories.StudentRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @UtilityClass
 public class SubjectPoolMapper {
-    public SubjectPoolEntity toEntity(final SubjectPool subjectPool) {
+    public SubjectPoolEntity toEntity(final SubjectPool subjectPool, Function<String, Optional<StudentEntity>> findById) {
         val entity = SubjectPoolEntity.builder()
                 .id(subjectPool.getId().getValue())
                 .fieldOfStudy(subjectPool.getFieldOfStudy())
                 .numberOfSubjectsToAttend(subjectPool.getNoSubjectsToAttend().getValue())
+                .students(subjectPool.getStudents()
+                        .stream()
+                        .map(s -> findById.apply(s.getValue()).orElse(null))
+                        .collect(Collectors.toSet()))
                 .build();
         val subjectEntities = subjectPool.getElectiveSubjects().stream().map(s -> toSubjectEntity(s, entity)).collect(Collectors.toSet());
         entity.setElectiveSubjects(subjectEntities);
@@ -65,11 +71,11 @@ public class SubjectPoolMapper {
                 .description(Description.of(subjectEntity.getDescription()))
                 .numberOfPlaces(NoPlaces.of(subjectEntity.getNumberOfPlaces()))
                 .tutor(Tutor.of(subjectEntity.getTutor()))
-                .qualifiedStudents(subjectEntity.getQualifiedStudents()
-                        .stream()
-                        .map(StudentMapper::toDomain)
-                        .collect(Collectors.toList()))
-//                .subjectChoices(subjectEntity.
+//                .qualifiedStudents(subjectEntity.getQualifiedStudents()
+//                        .stream()
+//                        .map(StudentMapper::toDomain)
+//                        .collect(Collectors.toList()))
+////                .subjectChoices(subjectEntity.
 //                .stream()
 //                .map(SubjectPoolMapper::toDomain)
 //                .collect(Collectors.toList()))

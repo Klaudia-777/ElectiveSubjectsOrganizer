@@ -1,11 +1,18 @@
 package org.agh.electer.core.infrastructure.dtoMappers;
 
 import lombok.val;
+import org.agh.electer.core.domain.student.AlbumNumber;
+import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.domain.subject.pool.NoSubjectsToAttend;
 import org.agh.electer.core.domain.subject.pool.SubjectPool;
 import org.agh.electer.core.domain.subject.pool.SubjectPoolId;
+import org.agh.electer.core.dto.StudentDto;
 import org.agh.electer.core.dto.SubjectPoolDto;
+import org.agh.electer.core.infrastructure.dao.StudentDao;
+import org.agh.electer.core.infrastructure.entities.StudentEntity;
 
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SubjectPoolDTOMapper {
@@ -15,6 +22,11 @@ public class SubjectPoolDTOMapper {
                 .fieldOfStudy(dto.getFieldOfStudy())
                 .noSubjectsToAttend(NoSubjectsToAttend.of(dto.getNumberOfSubjectsToAttend()))
                 .build();
+
+        domain.setStudents(dto.getStudents()
+                .stream()
+                .map(AlbumNumber::of)
+                .collect(Collectors.toSet()));
 
         domain.setElectiveSubjects(dto.getElectiveSubjects()
                 .stream()
@@ -30,6 +42,11 @@ public class SubjectPoolDTOMapper {
                 .fieldOfStudy(domain.getFieldOfStudy())
                 .numberOfSubjectsToAttend(domain.getNoSubjectsToAttend().getValue())
                 .build();
+
+        dto.setStudents(domain.getStudents()
+                .stream()
+                .map(AlbumNumber::getValue)
+                .collect(Collectors.toSet()));
 
         dto.setElectiveSubjects(domain.getElectiveSubjects()
                 .stream()

@@ -22,4 +22,7 @@ public class SubjectChoiceEntity {
     private String studentId;
 
     private String subjectId;
+
+    private boolean qualifiedOfNot;
 }
+

@@ -14,5 +14,5 @@ public class SubjectDto {
     private int numberOfPlaces;
     private String description;
     private List<SubjectChoiceDto> subjectChoices;
-    private List<StudentDto> qualifiedStudents;
+//    private List<StudentDto> qualifiedStudents;
 }

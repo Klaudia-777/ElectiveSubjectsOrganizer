@@ -2,6 +2,8 @@ package org.agh.electer.core.domain.subject.pool;
 
 import lombok.Builder;
 import lombok.Data;
+import org.agh.electer.core.domain.student.AlbumNumber;
+import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.domain.subject.Subject;
 import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
 
@@ -22,4 +24,7 @@ public class SubjectPool {
 
     @NotNull
     private NoSubjectsToAttend noSubjectsToAttend;
+
+    @NotNull
+    private Set<AlbumNumber> students;
 }

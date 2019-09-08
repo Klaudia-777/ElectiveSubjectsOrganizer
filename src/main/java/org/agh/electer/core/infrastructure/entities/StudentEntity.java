@@ -24,12 +24,15 @@ public class StudentEntity {
     private String Surname;
 
     @Column(name="ROLE")
+    @Enumerated(EnumType.STRING)
     private StudentsRole studentsRole;
 
     @Column (name= "FIELD_OF_STUDY")
+    @Enumerated(EnumType.STRING)
     private FieldOfStudy fieldOfStudy;
 
     @Column (name= "DEGREE")
+    @Enumerated(EnumType.STRING)
     private StudiesDegree studiesDegree;
 
     @Column (name= "SPECIALITY")
@@ -41,7 +44,7 @@ public class StudentEntity {
     @Column (name= "AVERAGE_GRADE")
     private double averageGrade;
 
-    @OneToMany(fetch= FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "student")
+    @OneToMany(fetch= FetchType.LAZY, cascade = CascadeType.ALL)
     private List<SubjectChoiceEntity> subjectChoices;
 
 }

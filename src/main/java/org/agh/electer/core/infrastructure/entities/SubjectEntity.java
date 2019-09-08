@@ -29,9 +29,10 @@ public class SubjectEntity {
     private String description;
 
     @ManyToOne(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name="SUBJECT_POOL")
     private SubjectPoolEntity subjectPool;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "subject")
-    @JoinColumn(name = "QUALIFIED_STUDENTS")
-    private List<StudentEntity> qualifiedStudents;
+//    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+////    @JoinColumn(name = "QUALIFIED_STUDENTS")
+//    private List<StudentEntity> qualifiedStudents;
 }

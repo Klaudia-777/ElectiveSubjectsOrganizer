@@ -22,6 +22,9 @@ public class SubjectChoice {
     @NotNull
     private AlbumNumber studentId;
 
+    @NotNull
+    private QualifiedOrNot qualifiedOrNot;
+
     public Priority getPriority() {
         return priority;
     }

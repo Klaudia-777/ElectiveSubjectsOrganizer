@@ -19,9 +19,12 @@ public class SubjectPoolEntity {
     @Column(name = "FIELD_OF_STUDY")
     private FieldOfStudy fieldOfStudy;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "SUBJECT_ID")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "subjectPool")
+//    @JoinColumn(name = "SUBJECT_ID")
     private Set<SubjectEntity> electiveSubjects;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<StudentEntity> students;
 
     @Column(name = "NUMBER_OF_SUBJECTS_TO_ATTEND")
     private int numberOfSubjectsToAttend;

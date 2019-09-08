@@ -8,7 +8,6 @@ import org.agh.electer.core.domain.subject.choice.Priority;
 import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.infrastructure.entities.*;
 
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -29,6 +28,7 @@ public class StudentMapper {
 
         val choices = student.getSubjectChoices().stream().map(subjectChoice ->
                 SubjectChoiceMapper.toEntity(subjectChoice, entity)).collect(Collectors.toList());
+
         entity.setSubjectChoices(choices);
         return entity;
     }

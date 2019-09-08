@@ -11,5 +11,6 @@ public class SubjectPoolDto {
     private String id;
     private FieldOfStudy fieldOfStudy;
     private Set<SubjectDto> electiveSubjects;
+    private Set<String> students;
     private int numberOfSubjectsToAttend;
 }
