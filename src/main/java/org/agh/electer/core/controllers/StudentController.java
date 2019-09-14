@@ -9,9 +9,14 @@ import org.agh.electer.core.dto.SubjectPoolDto;
 import org.agh.electer.core.infrastructure.dtoMappers.SubjectPoolDTOMapper;
 import org.agh.electer.core.infrastructure.repositories.StudentRepository;
 import org.agh.electer.core.infrastructure.repositories.SubjectPoolRepository;
+import org.agh.electer.core.service.CsvParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,15 +25,20 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class StudentController {
     private StudentRepository studentRepository;
+    private CsvParser csvParser;
+    private SubjectPoolRepository subjectPoolRepository;
 
     @Autowired
-    public StudentController(StudentRepository studentRepository, SubjectPoolRepository subjectPoolRepository) {
+    public StudentController(StudentRepository studentRepository, CsvParser csvParser, SubjectPoolRepository subjectPoolRepository) {
         this.studentRepository = studentRepository;
+        this.csvParser = csvParser;
         this.subjectPoolRepository = subjectPoolRepository;
     }
 
-    private SubjectPoolRepository subjectPoolRepository;
-
+    @PostMapping("/students")
+    public void uploadStudentsFile(MultipartFile multipartFile) throws IOException {
+        csvParser.parseStudentFile(multipartFile).forEach(studentRepository::save);
+    }
 
     @PostMapping("/students/login")
     public boolean login(@RequestBody CredentialsDTO credentialsDTO) {
