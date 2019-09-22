@@ -42,7 +42,7 @@ public class StudentEntity {
     private int numberOfSemester;
 
     @Column (name= "AVERAGE_GRADE")
-    private double averageGrade;
+    private Double averageGrade;
 
     @OneToMany(fetch= FetchType.LAZY, cascade = CascadeType.ALL)
     private List<SubjectChoiceEntity> subjectChoices;

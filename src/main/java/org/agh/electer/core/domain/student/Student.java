@@ -13,6 +13,7 @@ import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
 import org.agh.electer.core.infrastructure.entities.StudentsRole;
 import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
@@ -43,7 +44,8 @@ public class Student {
     private NoSemester numberOfSemester;
 
     @NotNull
-    private List<SubjectChoice> subjectChoices;
+    @Builder.Default
+    private List<SubjectChoice> subjectChoices= new ArrayList<>();
 
     private AverageGrade averageGrade;
 

@@ -3,12 +3,14 @@ package org.agh.electer.core.infrastructure.repositories;
 import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.infrastructure.dao.StudentDao;
+import org.agh.electer.core.infrastructure.dtoMappers.StudentDTOMapper;
 import org.agh.electer.core.infrastructure.mappers.StudentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 public class StudentRepositoryImpl implements StudentRepository {
@@ -32,7 +34,7 @@ public class StudentRepositoryImpl implements StudentRepository {
 
     @Override
     public Set<Student> getAll() {
-        return studentDao.getAll();
+        return studentDao.getAll().stream().map(StudentMapper::toDomain).collect(Collectors.toSet());
     }
 
     @Override

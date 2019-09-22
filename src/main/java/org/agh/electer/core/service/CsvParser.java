@@ -6,13 +6,14 @@ import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
 import org.agh.electer.core.infrastructure.entities.StudentsRole;
 import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CsvParser {
@@ -27,11 +28,13 @@ public class CsvParser {
     private static final int AVG_COLUMN = 8;
 
     public List<Student> parseStudentFile(MultipartFile multipartFile) throws IOException {
-        BufferedReader csvReader = new BufferedReader(new FileReader(multipartFile.getOriginalFilename()));
+        InputStream is = multipartFile.getInputStream();
+        BufferedReader csvReader = new BufferedReader(new InputStreamReader(is));
         String row;
         List<Student> studentList = new ArrayList<>();
+        csvReader.readLine();
         while ((row = csvReader.readLine()) != null) {
-            String[] data = row.split(",");
+            String[] data = row.split(";");
             val student = Student.builder()
                     .albumNumber(AlbumNumber.of(data[ALBUM_NUMBER_COLUMN]))
                     .fieldOfStudy(FieldOfStudy.valueOf(data[FIELD_OF_STUDY_COLUMN]))
@@ -39,10 +42,11 @@ public class CsvParser {
                     .numberOfSemester(NoSemester.of(Integer.valueOf(data[N0_SEMESTER_COLUMN])))
                     .Surname(Surname.of(data[SURNAME_COLUMN]))
                     .Name(Name.of(data[NAME_COLUMN]))
-                    .Speciality(Speciality.of(data[SPECIALITY_COLUMN]))
-                    .studentsRole(StudentsRole.valueOf(data[STUDENTS_ROLE_COLUMN]))
-                    .averageGrade(AverageGrade.of(Double.valueOf(data[AVG_COLUMN])))
+//                    .Speciality(Speciality.of(data[SPECIALITY_COLUMN]))
+//                    .studentsRole(StudentsRole.valueOf(data[STUDENTS_ROLE_COLUMN]))
+//                    .averageGrade(AverageGrade.of(Double.valueOf(data[AVG_COLUMN])))
                     .build();
+            System.out.println(student);
             studentList.add(student);
         }
         csvReader.close();

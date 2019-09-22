@@ -8,6 +8,7 @@ import org.agh.electer.core.domain.subject.choice.Priority;
 import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.infrastructure.entities.*;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -20,8 +21,8 @@ public class StudentMapper {
                 .Surname(student.getSurname().getValue())
                 .fieldOfStudy(student.getFieldOfStudy())
                 .numberOfSemester(student.getNumberOfSemester().getValue())
-                .Speciality(student.getSpeciality().getValue())
-                .averageGrade(student.getAverageGrade().getValue())
+                .Speciality(Optional.ofNullable(student.getSpeciality()).map(Speciality::getValue).orElse(null))
+                .averageGrade(Optional.ofNullable(student.getAverageGrade()).map(AverageGrade::getValue).orElse(null))
                 .studentsRole(student.getStudentsRole())
                 .studiesDegree(student.getStudiesDegree())
                 .build();
@@ -41,8 +42,8 @@ public class StudentMapper {
                 .Surname(Surname.of(studentEntity.getSurname()))
                 .fieldOfStudy(studentEntity.getFieldOfStudy())
                 .numberOfSemester(NoSemester.of(studentEntity.getNumberOfSemester()))
-                .Speciality(Speciality.of(studentEntity.getSpeciality()))
-                .averageGrade(AverageGrade.of(studentEntity.getAverageGrade()))
+                .Speciality(Optional.ofNullable(studentEntity.getSpeciality()).map(Speciality::of).orElse(null))
+                .averageGrade(Optional.ofNullable(studentEntity.getAverageGrade()).map(AverageGrade::of).orElse(null))
                 .studentsRole(studentEntity.getStudentsRole())
                 .studiesDegree(studentEntity.getStudiesDegree())
                 .subjectChoices(studentEntity.getSubjectChoices().stream()
@@ -51,4 +52,5 @@ public class StudentMapper {
                 .build();
         return student;
     }
+
 }

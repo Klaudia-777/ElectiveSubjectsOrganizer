@@ -8,7 +8,7 @@ import java.util.Comparator;
 @Value
 @AllArgsConstructor(staticName = "of")
 public class AverageGrade implements Comparator<AverageGrade> {
-    private double value;
+    private Double value;
 
     @Override
     public int compare(AverageGrade o1, AverageGrade o2) {

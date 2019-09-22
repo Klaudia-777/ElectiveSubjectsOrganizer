@@ -5,6 +5,7 @@ import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
 import org.agh.electer.core.infrastructure.entities.StudentsRole;
 import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,6 +19,7 @@ public class StudentDto {
     private StudiesDegree studiesDegree;
     private String Speciality;
     private int numberOfSemester;
-    private double averageGrade;
-    private List<SubjectChoiceDto> subjectChoices;
+    private Double averageGrade;
+    @Builder.Default
+    private List<SubjectChoiceDto> subjectChoices=new ArrayList<>();
 }

@@ -11,5 +11,5 @@ import java.util.Set;
 @Repository
 public interface StudentDao extends CrudRepository<StudentEntity,String> {
     @Query("select distinct s from STUDENTS_TABLE s ")
-    Set<Student> getAll();
+    Set<StudentEntity> getAll();
 }

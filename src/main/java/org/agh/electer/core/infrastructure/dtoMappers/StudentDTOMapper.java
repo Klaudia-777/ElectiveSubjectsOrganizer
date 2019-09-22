@@ -4,6 +4,7 @@ import lombok.val;
 import org.agh.electer.core.domain.student.*;
 import org.agh.electer.core.dto.StudentDto;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class StudentDTOMapper {
@@ -15,9 +16,9 @@ public class StudentDTOMapper {
                 .Surname(Surname.of(dto.getSurname()))
                 .studentsRole(dto.getStudentsRole())
                 .studiesDegree(dto.getStudiesDegree())
-                .averageGrade(AverageGrade.of(dto.getAverageGrade()))
+                .averageGrade(Optional.ofNullable(dto.getAverageGrade()).map(AverageGrade::of).orElse(null))
                 .numberOfSemester(NoSemester.of(dto.getNumberOfSemester()))
-                .Speciality(Speciality.of(dto.getSpeciality()))
+                .Speciality(Optional.ofNullable(dto.getSpeciality()).map(Speciality::of).orElse(null))
                 .fieldOfStudy(dto.getFieldOfStudy())
                 .build();
         domain.setSubjectChoices(dto.getSubjectChoices()
@@ -33,10 +34,10 @@ public class StudentDTOMapper {
                 .albumNumber(domain.getAlbumNumber().getValue())
                 .Name(domain.getName().getValue())
                 .Surname(domain.getSurname().getValue())
-                .averageGrade(domain.getAverageGrade().getValue())
+                .averageGrade(Optional.ofNullable(domain.getAverageGrade()).map(AverageGrade::getValue).orElse(null))
                 .fieldOfStudy(domain.getFieldOfStudy())
                 .numberOfSemester(domain.getNumberOfSemester().getValue())
-                .Speciality(domain.getSpeciality().getValue())
+                .Speciality(Optional.ofNullable(domain.getSpeciality()).map(Speciality::getValue).orElse(null))
                 .studentsRole(domain.getStudentsRole())
                 .studiesDegree(domain.getStudiesDegree())
                 .build();
