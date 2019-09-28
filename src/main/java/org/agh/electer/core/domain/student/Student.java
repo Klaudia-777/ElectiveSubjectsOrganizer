@@ -12,6 +12,7 @@ import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
 import org.agh.electer.core.infrastructure.entities.StudentsRole;
 import org.agh.electer.core.infrastructure.entities.StudiesDegree;
+import org.agh.electer.core.infrastructure.entities.TypeOfSemester;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +39,20 @@ public class Student {
     private FieldOfStudy fieldOfStudy;
 
     @NotNull
+    private TypeOfSemester typeOfSemester;
+
+    @NotNull
     private StudiesDegree studiesDegree;
 
     @NotNull
     private NoSemester numberOfSemester;
 
     @NotNull
+    private YearOfStudies year;
+
+    @NotNull
     @Builder.Default
-    private List<SubjectChoice> subjectChoices= new ArrayList<>();
+    private List<SubjectChoice> subjectChoices = new ArrayList<>();
 
     private AverageGrade averageGrade;
 
@@ -62,7 +69,8 @@ public class Student {
     public SubjectChoice findSubjectChoiceBySubjectId(SubjectId subjectId) {
         return subjectChoices.stream().filter(sc -> sc.getSubjectId().equals(subjectId)).findFirst().orElse(null);
     }
-    public Priority getSubjectChoicePriority(SubjectId subjectId){
+
+    public Priority getSubjectChoicePriority(SubjectId subjectId) {
         return findSubjectChoiceBySubjectId(subjectId).getPriority();
     }
 

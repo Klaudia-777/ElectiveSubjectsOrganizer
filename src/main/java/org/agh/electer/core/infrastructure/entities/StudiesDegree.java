@@ -1,6 +1,6 @@
 package org.agh.electer.core.infrastructure.entities;
 
 public enum StudiesDegree {
-    I,
-    II
+    pierwszego_stopnia,
+    drugiego_stopnia
 }

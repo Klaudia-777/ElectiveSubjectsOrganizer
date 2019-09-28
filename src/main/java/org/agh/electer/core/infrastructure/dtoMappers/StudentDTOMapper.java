@@ -20,6 +20,8 @@ public class StudentDTOMapper {
                 .numberOfSemester(NoSemester.of(dto.getNumberOfSemester()))
                 .Speciality(Optional.ofNullable(dto.getSpeciality()).map(Speciality::of).orElse(null))
                 .fieldOfStudy(dto.getFieldOfStudy())
+                .typeOfSemester(dto.getTypeOfSemester())
+                .year(YearOfStudies.of(dto.getYear()))
                 .build();
         domain.setSubjectChoices(dto.getSubjectChoices()
                 .stream()
@@ -37,9 +39,11 @@ public class StudentDTOMapper {
                 .averageGrade(Optional.ofNullable(domain.getAverageGrade()).map(AverageGrade::getValue).orElse(null))
                 .fieldOfStudy(domain.getFieldOfStudy())
                 .numberOfSemester(domain.getNumberOfSemester().getValue())
+                .year(domain.getYear().getValue())
                 .Speciality(Optional.ofNullable(domain.getSpeciality()).map(Speciality::getValue).orElse(null))
                 .studentsRole(domain.getStudentsRole())
                 .studiesDegree(domain.getStudiesDegree())
+                .typeOfSemester(domain.getTypeOfSemester())
                 .build();
         dto.setSubjectChoices(domain.getSubjectChoices()
                 .stream()

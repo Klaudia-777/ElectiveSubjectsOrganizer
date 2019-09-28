@@ -31,6 +31,10 @@ public class StudentEntity {
     @Enumerated(EnumType.STRING)
     private FieldOfStudy fieldOfStudy;
 
+    @Column (name= "TYPE_OF_SEMESTER")
+    @Enumerated(EnumType.STRING)
+    private TypeOfSemester typeOfSemester;
+
     @Column (name= "DEGREE")
     @Enumerated(EnumType.STRING)
     private StudiesDegree studiesDegree;
@@ -40,6 +44,9 @@ public class StudentEntity {
 
     @Column (name= "NO_SEMESTER")
     private int numberOfSemester;
+
+    @Column (name= "YEAR")
+    private int year;
 
     @Column (name= "AVERAGE_GRADE")
     private Double averageGrade;

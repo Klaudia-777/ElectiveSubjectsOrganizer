@@ -25,6 +25,8 @@ public class StudentMapper {
                 .averageGrade(Optional.ofNullable(student.getAverageGrade()).map(AverageGrade::getValue).orElse(null))
                 .studentsRole(student.getStudentsRole())
                 .studiesDegree(student.getStudiesDegree())
+                .year(student.getYear().getValue())
+                .typeOfSemester(student.getTypeOfSemester())
                 .build();
 
         val choices = student.getSubjectChoices().stream().map(subjectChoice ->
@@ -46,6 +48,8 @@ public class StudentMapper {
                 .averageGrade(Optional.ofNullable(studentEntity.getAverageGrade()).map(AverageGrade::of).orElse(null))
                 .studentsRole(studentEntity.getStudentsRole())
                 .studiesDegree(studentEntity.getStudiesDegree())
+                .year(YearOfStudies.of(studentEntity.getYear()))
+                .typeOfSemester(studentEntity.getTypeOfSemester())
                 .subjectChoices(studentEntity.getSubjectChoices().stream()
                         .map(SubjectChoiceMapper::toDomain)
                         .collect(Collectors.toList()))

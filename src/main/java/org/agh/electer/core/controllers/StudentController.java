@@ -38,7 +38,7 @@ public class StudentController {
 
     @PostMapping("/students")
     public void uploadStudentsFile(@RequestParam(name = "file") MultipartFile multipartFile) throws IOException {
-        csvParser.parseStudentFile(multipartFile).forEach(studentRepository::save);
+        csvParser.parseStudentFile(multipartFile,studentRepository).forEach(studentRepository::save);
     }
 
     @PostMapping("/students/login")
