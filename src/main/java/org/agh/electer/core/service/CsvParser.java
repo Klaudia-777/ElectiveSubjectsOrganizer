@@ -2,17 +2,21 @@ package org.agh.electer.core.service;
 
 import lombok.val;
 import org.agh.electer.core.domain.student.*;
+import org.agh.electer.core.domain.subject.*;
+import org.agh.electer.core.domain.subject.pool.NoSubjectsToAttend;
+import org.agh.electer.core.domain.subject.pool.SubjectPool;
+import org.agh.electer.core.domain.subject.pool.SubjectPoolId;
 import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
 import org.agh.electer.core.infrastructure.entities.StudentsRole;
 import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 import org.agh.electer.core.infrastructure.entities.TypeOfSemester;
 import org.agh.electer.core.infrastructure.repositories.StudentRepository;
+import org.agh.electer.core.infrastructure.repositories.SubjectPoolRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CsvParser {
@@ -29,10 +33,19 @@ public class CsvParser {
     private static final int STUDENTS_ROLE_COLUMN = 10;
 
 
-    public List<Student> parseStudentFile(MultipartFile multipartFile, StudentRepository studentRepository) throws IOException {
+    private static final int SUBJECT_POOL_FIELD_OF_STUDY_COLUMN = 0;
+    private static final int GRADE_COLUMN = 1;
+    private static final int NO_SEMESTER_COLUMN = 2;
+    private static final int SUBJECT_NAME_COLUMN = 3;
+    private static final int LECTURER_COLUMN = 4;
+    private static final int NO_PLACES_COLUMN = 5;
+
+    public List<Student> parseStudentFile(MultipartFile multipartFile,
+                                          StudentRepository studentRepository) throws IOException {
         InputStream is = multipartFile.getInputStream();
         BufferedReader csvReader = new BufferedReader(new InputStreamReader(is));
         String row;
+
         List<Student> studentList = new ArrayList<>();
         csvReader.readLine();
         while ((row = csvReader.readLine()) != null) {
@@ -41,12 +54,12 @@ public class CsvParser {
             if (studentRepository.findById(AlbumNumber.of(data[ALBUM_NUMBER_COLUMN])).orElse(null) == null) {
                 student.setAlbumNumber(AlbumNumber.of(data[ALBUM_NUMBER_COLUMN]));
                 student.setFieldOfStudy(FieldOfStudy.valueOf(data[FIELD_OF_STUDY_COLUMN]));
-                student.setStudiesDegree(StudiesDegree.valueOf(data[STUDIES_DEGREE_COLUMN].replace(' ','_')));
+                student.setStudiesDegree(StudiesDegree.valueOf(data[STUDIES_DEGREE_COLUMN].replace(' ', '_').toLowerCase()));
                 student.setNumberOfSemester(NoSemester.of(Integer.valueOf(data[N0_SEMESTER_COLUMN])));
                 student.setSurname(Surname.of(data[SURNAME_COLUMN]));
                 student.setName(Name.of(data[NAME_COLUMN]));
                 student.setSpeciality(Speciality.of(data[SPECIALITY_COLUMN]));
-                student.setAverageGrade(AverageGrade.of(Double.valueOf(data[AVG_COLUMN].replace(',','.'))));
+                student.setAverageGrade(AverageGrade.of(Double.valueOf(data[AVG_COLUMN].replace(',', '.'))));
                 student.setYear(YearOfStudies.of(Integer.valueOf(data[YEAR_COLUMN])));
                 student.setTypeOfSemester(TypeOfSemester.valueOf(data[TYPE_COLUMN]));
 
@@ -64,4 +77,43 @@ public class CsvParser {
         csvReader.close();
         return studentList;
     }
-}
+
+    public SubjectPool parseSubjectFile(MultipartFile multipartFile,
+                                        SubjectPoolRepository subjectPoolRepository) throws IOException {
+        InputStream is = multipartFile.getInputStream();
+        BufferedReader csvReader = new BufferedReader(new InputStreamReader(is));
+        String row;
+
+        SubjectPool subjectPool = SubjectPool.builder().build();
+        subjectPool.setId(SubjectPoolId.of(UUID.randomUUID().toString()));
+        subjectPool.setStudents(new HashSet<>());
+        subjectPool.setElectiveSubjects(new HashSet<>());
+        subjectPoolRepository.save(subjectPool);
+
+        Set<Subject> subjectSet = new HashSet<>();
+        csvReader.readLine();
+
+        while ((row = csvReader.readLine()) != null) {
+            String[] data = row.split(";");
+            val subject = Subject.builder()
+                    .subjectId(SubjectId.of((UUID.randomUUID().toString())))
+                    .subjectName(SubjectName.of(data[SUBJECT_NAME_COLUMN]))
+                    .tutor(Tutor.of(data[LECTURER_COLUMN]))
+                    .numberOfPlaces(NoPlaces.of(Integer.valueOf(data[NO_PLACES_COLUMN])))
+                    .build();
+            subjectSet.add(subject);
+
+//            if (subjectPoolRepository.findById(subjectPool.getId()).get().getFieldOfStudy() == null) {
+                subjectPool.setFieldOfStudy(FieldOfStudy.valueOf(data[SUBJECT_POOL_FIELD_OF_STUDY_COLUMN]));
+                subjectPool.setNoSemester(org.agh.electer.core.domain.subject.pool.NoSemester.of(Integer.valueOf(data[NO_SEMESTER_COLUMN])));
+                subjectPool.setStudiesDegree(StudiesDegree.valueOf(data[GRADE_COLUMN].replace(' ', '_').toLowerCase()));
+//            }
+
+            }
+            subjectPool.setElectiveSubjects(subjectSet);
+            subjectPool.setNoSubjectsToAttend(NoSubjectsToAttend.of(subjectSet.size()));
+
+            csvReader.close();
+            return subjectPool;
+        }
+    }

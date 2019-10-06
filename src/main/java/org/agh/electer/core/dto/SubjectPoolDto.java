@@ -2,6 +2,7 @@ package org.agh.electer.core.dto;
 
 import lombok.*;
 import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
+import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 
 import java.util.Set;
 
@@ -13,4 +14,6 @@ public class SubjectPoolDto {
     private Set<SubjectDto> electiveSubjects;
     private Set<String> students;
     private int numberOfSubjectsToAttend;
+    private StudiesDegree studiesDegree;
+    private int noSemester;
 }

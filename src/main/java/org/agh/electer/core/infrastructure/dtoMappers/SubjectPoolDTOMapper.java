@@ -3,6 +3,7 @@ package org.agh.electer.core.infrastructure.dtoMappers;
 import lombok.val;
 import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.student.Student;
+import org.agh.electer.core.domain.subject.pool.NoSemester;
 import org.agh.electer.core.domain.subject.pool.NoSubjectsToAttend;
 import org.agh.electer.core.domain.subject.pool.SubjectPool;
 import org.agh.electer.core.domain.subject.pool.SubjectPoolId;
@@ -20,6 +21,8 @@ public class SubjectPoolDTOMapper {
         val domain = SubjectPool.builder()
                 .id(SubjectPoolId.of(dto.getId()))
                 .fieldOfStudy(dto.getFieldOfStudy())
+                .noSemester(NoSemester.of(dto.getNoSemester()))
+                .studiesDegree(dto.getStudiesDegree())
                 .noSubjectsToAttend(NoSubjectsToAttend.of(dto.getNumberOfSubjectsToAttend()))
                 .build();
 
@@ -40,6 +43,8 @@ public class SubjectPoolDTOMapper {
         val dto = SubjectPoolDto.builder()
                 .id(domain.getId().getValue())
                 .fieldOfStudy(domain.getFieldOfStudy())
+                .noSemester(domain.getNoSemester().getValue())
+                .studiesDegree(domain.getStudiesDegree())
                 .numberOfSubjectsToAttend(domain.getNoSubjectsToAttend().getValue())
                 .build();
 

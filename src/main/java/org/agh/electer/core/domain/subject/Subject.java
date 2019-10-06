@@ -16,7 +16,7 @@ public class Subject {
     private SubjectId subjectId;
 
     @NotNull
-    private Name name;
+    private SubjectName subjectName;
 
     @NotNull
     private Tutor tutor;

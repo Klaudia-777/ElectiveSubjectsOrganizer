@@ -5,6 +5,6 @@ import lombok.Value;
 
 @Value
 @AllArgsConstructor(staticName = "of")
-public class NoSubjectsToAttend {
+public class NoSemester {
     private Integer value;
 }

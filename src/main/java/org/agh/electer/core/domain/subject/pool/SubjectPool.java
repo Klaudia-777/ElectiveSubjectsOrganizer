@@ -6,6 +6,7 @@ import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.domain.subject.Subject;
 import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
+import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 
 import javax.validation.constraints.NotNull;
 import java.util.Set;
@@ -16,13 +17,15 @@ public class SubjectPool {
     @NotNull
     private SubjectPoolId id;
 
-    @NotNull
     private FieldOfStudy fieldOfStudy;
+
+    private NoSemester noSemester;
+
+    private StudiesDegree studiesDegree;
 
     @NotNull
     private Set<Subject> electiveSubjects;
 
-    @NotNull
     private NoSubjectsToAttend noSubjectsToAttend;
 
     @NotNull

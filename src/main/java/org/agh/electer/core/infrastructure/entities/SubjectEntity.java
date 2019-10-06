@@ -33,6 +33,6 @@ public class SubjectEntity {
     private SubjectPoolEntity subjectPool;
 
 //    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-////    @JoinColumn(name = "QUALIFIED_STUDENTS")
+////    @JoinColumn(subjectName = "QUALIFIED_STUDENTS")
 //    private List<StudentEntity> qualifiedStudents;
 }

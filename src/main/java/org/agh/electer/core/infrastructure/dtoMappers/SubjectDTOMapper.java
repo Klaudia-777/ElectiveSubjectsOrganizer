@@ -12,7 +12,7 @@ public class SubjectDTOMapper {
     public static Subject toDomain(final SubjectDto dto) {
         val domain = Subject.builder()
                 .subjectId(SubjectId.of(dto.getId()))
-                .name(Name.of(dto.getName()))
+                .subjectName(SubjectName.of(dto.getName()))
                 .tutor(Tutor.of(dto.getTutor()))
                 .description(Description.of(dto.getDescription()))
                 .numberOfPlaces(NoPlaces.of(dto.getNumberOfPlaces()))
@@ -27,7 +27,7 @@ public class SubjectDTOMapper {
     public static SubjectDto toDto(final Subject domain) {
         val dto = SubjectDto.builder()
                 .id(domain.getSubjectId().getValue())
-                .name(domain.getName().getValue())
+                .name(domain.getSubjectName().getValue())
                 .tutor(domain.getTutor().getValue())
                 .description(domain.getDescription().getValue())
                 .numberOfPlaces(domain.getNumberOfPlaces().getValue())
