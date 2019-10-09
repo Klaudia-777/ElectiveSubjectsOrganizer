@@ -10,5 +10,5 @@ import java.util.Set;
 @Repository
 public interface SubjectPoolDao extends CrudRepository<SubjectPoolEntity,String> {
     @Query("select distinct s from SUBJECT_POOL_TABLE s ")
-    Set<SubjectPool> getAll();
+    Set<SubjectPoolEntity> getAll();
 }

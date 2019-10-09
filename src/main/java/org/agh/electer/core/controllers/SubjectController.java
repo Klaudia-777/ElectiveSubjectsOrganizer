@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.security.auth.Subject;
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -21,16 +21,17 @@ import java.io.IOException;
 public class SubjectController {
     private CsvParser csvParser;
     private SubjectPoolRepository subjectPoolRepository;
+    private StudentRepository studentRepository;
 
-    public SubjectController(CsvParser csvParser, SubjectPoolRepository subjectPoolRepository) {
+    public SubjectController(CsvParser csvParser, SubjectPoolRepository subjectPoolRepository, StudentRepository studentRepository) {
         this.csvParser = csvParser;
         this.subjectPoolRepository = subjectPoolRepository;
+        this.studentRepository = studentRepository;
     }
 
     @PostMapping("/subjects")
     public void uploadSubjectsFile(@RequestParam(name = "file") MultipartFile multipartFile) throws IOException {
-        SubjectPool subjectPool = csvParser.parseSubjectFile(multipartFile,subjectPoolRepository);
-        subjectPoolRepository.update(subjectPool);
+        Optional<SubjectPool> subjectPool = Optional.ofNullable(csvParser.parseSubjectFile(multipartFile,subjectPoolRepository,studentRepository));
+        subjectPool.ifPresent(subjectPoolRepository::save);
     }
-
 }

@@ -4,10 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.student.Student;
+import org.agh.electer.core.domain.subject.pool.SubjectPool;
 import org.agh.electer.core.dto.CredentialsDTO;
 import org.agh.electer.core.dto.SubjectDto;
 import org.agh.electer.core.dto.SubjectPoolDto;
-import org.agh.electer.core.infrastructure.dao.SubjectPoolDao;
 import org.agh.electer.core.infrastructure.dtoMappers.SubjectPoolDTOMapper;
 import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
 import org.agh.electer.core.infrastructure.repositories.StudentRepository;
@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,7 +41,8 @@ public class StudentController {
 
     @PostMapping("/students")
     public void uploadStudentsFile(@RequestParam(name = "file") MultipartFile multipartFile) throws IOException {
-        csvParser.parseStudentFile(multipartFile,studentRepository).forEach(studentRepository::save);
+        Optional.ofNullable(csvParser.parseStudentFile(multipartFile,studentRepository))
+                .ifPresent(n->n.forEach(studentRepository::save));
     }
 
     @PostMapping("/students/login")
@@ -79,14 +83,16 @@ public class StudentController {
         return fieldOfStudy.toString();
     }
 
-    @GetMapping("/subjectPool")
-    public List<SubjectPoolDto> getSubjectPoolForStudent(String albumNumber) {
+    @GetMapping("/subjectPool/{albumNumber}")
+    public Set<SubjectDto> getSubjectPoolForStudent(@PathVariable String albumNumber) {
         return subjectPoolRepository
                 .getAll()
                 .stream()
                 .filter(sp -> sp.getStudents().contains(AlbumNumber.of(albumNumber)))
                 .map(SubjectPoolDTOMapper::toDto)
-                .collect(Collectors.toList());
+                .map(SubjectPoolDto::getElectiveSubjects)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
 
 }

@@ -2,6 +2,7 @@ package org.agh.electer.core.infrastructure.mappers;
 
 import lombok.experimental.UtilityClass;
 import lombok.val;
+import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.subject.*;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 import org.agh.electer.core.domain.subject.pool.NoSemester;
@@ -57,6 +58,7 @@ public class SubjectPoolMapper {
                 .noSubjectsToAttend(NoSubjectsToAttend.of(s.getNumberOfSubjectsToAttend()))
                 .noSemester(NoSemester.of(s.getNoSemester()))
                 .studiesDegree(s.getStudiesDegree())
+                .students(s.getStudents().stream().map(StudentEntity::getAlbumNumber).map(AlbumNumber::of).collect(Collectors.toSet()))
                 .electiveSubjects(s.getElectiveSubjects()
                         .stream()
                         .map(subjectEntity -> toDomain(subjectEntity, subjectChoiceSelector))

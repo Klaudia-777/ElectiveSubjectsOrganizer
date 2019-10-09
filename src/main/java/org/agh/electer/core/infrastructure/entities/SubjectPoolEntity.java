@@ -17,16 +17,18 @@ public class SubjectPoolEntity {
     private String id;
 
     @Column(name = "FIELD_OF_STUDY")
+    @Enumerated(value = EnumType.STRING)
     private FieldOfStudy fieldOfStudy;
 
     @Column(name = "NO_SEMESTER")
     private Integer noSemester;
 
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "STUDIES_DEGREE")
     private StudiesDegree studiesDegree;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "subjectPool")
-//    @JoinColumn(subjectName = "SUBJECT_ID")
+//    @JoinColumn(name = "SUBJECT_ID")
     private Set<SubjectEntity> electiveSubjects;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

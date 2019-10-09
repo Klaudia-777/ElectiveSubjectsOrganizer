@@ -45,7 +45,7 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
 
     @Override
     public Set<SubjectPool> getAll() {
-        return subjectPoolDao.getAll();
+        return subjectPoolDao.getAll().stream().map(e->SubjectPoolMapper.toDomain(e, this::selectSubjectChoicesForSubject)).collect(Collectors.toSet());
     }
 
     @Override

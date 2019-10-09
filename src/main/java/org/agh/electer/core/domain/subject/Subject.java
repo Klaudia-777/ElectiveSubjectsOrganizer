@@ -6,6 +6,7 @@ import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -25,7 +26,8 @@ public class Subject {
     private NoPlaces numberOfPlaces;
 
     @NotNull
-    private List<SubjectChoice> subjectChoices;
+    @Builder.Default
+    private List<SubjectChoice> subjectChoices =new ArrayList<>();
 
     private Description description;
 

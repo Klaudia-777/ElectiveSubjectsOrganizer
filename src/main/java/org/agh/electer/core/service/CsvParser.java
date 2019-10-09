@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CsvParser {
@@ -47,7 +48,9 @@ public class CsvParser {
         String row;
 
         List<Student> studentList = new ArrayList<>();
-        csvReader.readLine();
+        String firstLine = csvReader.readLine();
+
+//        if (firstLine.equals("Nr albumu;Kierunek;Typ studi�w;Nr semestru;Nazwisko;Imi�;Specjalno�;�rednia ocen")) {
         while ((row = csvReader.readLine()) != null) {
             String[] data = row.split(";");
             val student = Student.builder().build();
@@ -76,38 +79,40 @@ public class CsvParser {
         }
         csvReader.close();
         return studentList;
+
     }
+//        else
+//            return null;
+//    }
 
     public SubjectPool parseSubjectFile(MultipartFile multipartFile,
-                                        SubjectPoolRepository subjectPoolRepository) throws IOException {
+                                        SubjectPoolRepository subjectPoolRepository,
+                                        StudentRepository studentRepository) throws IOException {
         InputStream is = multipartFile.getInputStream();
         BufferedReader csvReader = new BufferedReader(new InputStreamReader(is));
         String row;
-
         SubjectPool subjectPool = SubjectPool.builder().build();
-        subjectPool.setId(SubjectPoolId.of(UUID.randomUUID().toString()));
-        subjectPool.setStudents(new HashSet<>());
-        subjectPool.setElectiveSubjects(new HashSet<>());
-        subjectPoolRepository.save(subjectPool);
-
         Set<Subject> subjectSet = new HashSet<>();
-        csvReader.readLine();
+        String firstLine = csvReader.readLine();
 
-        while ((row = csvReader.readLine()) != null) {
-            String[] data = row.split(";");
-            val subject = Subject.builder()
-                    .subjectId(SubjectId.of((UUID.randomUUID().toString())))
-                    .subjectName(SubjectName.of(data[SUBJECT_NAME_COLUMN]))
-                    .tutor(Tutor.of(data[LECTURER_COLUMN]))
-                    .numberOfPlaces(NoPlaces.of(Integer.valueOf(data[NO_PLACES_COLUMN])))
-                    .build();
-            subjectSet.add(subject);
+        if (firstLine.equals("Kierunek;Stopie�;Semestr;Nazwa przedmiotu;Prowadz�cy;Limit")) {
 
-//            if (subjectPoolRepository.findById(subjectPool.getId()).get().getFieldOfStudy() == null) {
-                subjectPool.setFieldOfStudy(FieldOfStudy.valueOf(data[SUBJECT_POOL_FIELD_OF_STUDY_COLUMN]));
-                subjectPool.setNoSemester(org.agh.electer.core.domain.subject.pool.NoSemester.of(Integer.valueOf(data[NO_SEMESTER_COLUMN])));
-                subjectPool.setStudiesDegree(StudiesDegree.valueOf(data[GRADE_COLUMN].replace(' ', '_').toLowerCase()));
-//            }
+            subjectPool.setId(SubjectPoolId.of(UUID.randomUUID().toString()));
+            subjectPool.setStudents(new HashSet<>());
+            subjectPool.setElectiveSubjects(new HashSet<>());
+            subjectPoolRepository.save(subjectPool);
+
+            while ((row = csvReader.readLine()) != null) {
+                String[] data = row.split(";");
+                val subject = Subject.builder()
+                        .subjectId(SubjectId.of((UUID.randomUUID().toString())))
+                        .subjectName(SubjectName.of(data[SUBJECT_NAME_COLUMN]))
+                        .tutor(Tutor.of(data[LECTURER_COLUMN]))
+                        .numberOfPlaces(NoPlaces.of(Integer.valueOf(data[NO_PLACES_COLUMN])))
+                        .build();
+                subjectSet.add(subject);
+
+                setStudentsForSubjectPool(studentRepository, subjectPool, data);
 
             }
             subjectPool.setElectiveSubjects(subjectSet);
@@ -115,5 +120,23 @@ public class CsvParser {
 
             csvReader.close();
             return subjectPool;
-        }
+        } else
+            return null;
     }
+
+    private void setStudentsForSubjectPool(StudentRepository studentRepository, SubjectPool subjectPool, String[] data) {
+        FieldOfStudy fieldOfStudy = FieldOfStudy.valueOf(data[SUBJECT_POOL_FIELD_OF_STUDY_COLUMN]);
+        val noSemester = org.agh.electer.core.domain.subject.pool.NoSemester.of(Integer.valueOf(data[NO_SEMESTER_COLUMN]));
+        StudiesDegree studiesDegree = StudiesDegree.valueOf(data[GRADE_COLUMN].replace(' ', '_').toLowerCase());
+
+        Set<AlbumNumber> studentsForThisSubjectPool = studentRepository.findByFieldOfStudy(fieldOfStudy, noSemester, studiesDegree)
+                .stream()
+                .map(Student::getAlbumNumber)
+                .collect(Collectors.toSet());
+
+        subjectPool.setFieldOfStudy(fieldOfStudy);
+        subjectPool.setNoSemester(noSemester);
+        subjectPool.setStudiesDegree(studiesDegree);
+        subjectPool.setStudents(studentsForThisSubjectPool);
+    }
+}
