@@ -6,6 +6,7 @@ import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
+import org.agh.electer.core.domain.subject.pool.NoSemester;
 import org.agh.electer.core.domain.subject.pool.SubjectPool;
 import org.agh.electer.core.dto.CredentialsDTO;
 import org.agh.electer.core.dto.SubjectChoiceDto;
@@ -43,34 +44,35 @@ public class StudentController {
 
     @PostMapping("/students")
     public void uploadStudentsFile(@RequestParam(name = "file") MultipartFile multipartFile) throws IOException {
-        Optional.ofNullable(csvParser.parseStudentFile(multipartFile,studentRepository))
-                .ifPresent(n->n.forEach(studentRepository::save));
+        Optional.ofNullable(csvParser.parseStudentFile(multipartFile, studentRepository))
+                .ifPresent(n -> n.forEach(studentRepository::save));
     }
 
-    @PostMapping("/students/saveChoices")
-    public void saveSubjectChoices(@RequestBody List<SubjectChoice> listOfChoices, AlbumNumber albumNumber){
-        log.info(albumNumber.toString());
-        log.info(listOfChoices.get(1).toString());
+    @PostMapping("/students/{albumNr}/saveChoices")
+    public void saveSubjectChoices(@RequestBody List<SubjectChoiceDto> priorities, @PathVariable String albumNr) {
+        log.info(albumNr);
+        log.info(priorities.get(1).toString());
 
-        listOfChoices.forEach(n->n.setId(SubjectChoiceId.of(UUID.randomUUID().toString())));
+        val choices = priorities.stream().map(SubjectChoiceDTOMapper::toDomain)
+                .peek(n -> n.setId(SubjectChoiceId.of(UUID.randomUUID().toString()))).collect(Collectors.toList());
 
-        Optional<Student> student=Optional.ofNullable(studentRepository.findById(albumNumber)).orElseGet(null);
-        student.ifPresent(n->n.setSubjectChoices(listOfChoices));
-        studentRepository.update(student.orElse(null));
+        Student student = studentRepository.findById(AlbumNumber.of(albumNr)).get();
+        student.setSubjectChoices(choices);
+        studentRepository.update(student);
 
-        SubjectPool subjectPool=subjectPoolRepository.findByFieldOfStudy(student.get().getFieldOfStudy(),
-                student.get().getNumberOfSemester(),
-                student.get().getStudiesDegree());
-        subjectPool.getElectiveSubjects().forEach(n->n.setSubjectChoices(listOfChoices));
+        SubjectPool subjectPool = subjectPoolRepository.findByFieldOfStudy(student.getFieldOfStudy(),
+                NoSemester.of(student.getNumberOfSemester().getValue()),
+                student.getStudiesDegree());
+        subjectPool.getElectiveSubjects().forEach(n -> n.setSubjectChoices(choices));
         subjectPoolRepository.update(subjectPool);
 
-        log.info(student.get().getSubjectChoices().toString());
+        log.info(student.getSubjectChoices().toString());
     }
 
     @PostMapping("/students/login")
     public boolean login(@RequestBody CredentialsDTO credentialsDTO) {
         val result = studentRepository.findById(AlbumNumber.of(credentialsDTO.getAlbumNumber()))
-                .filter(s -> checkIfStudentExists(credentialsDTO,s))
+                .filter(s -> checkIfStudentExists(credentialsDTO, s))
                 .isPresent();
         log.info("Oto wynik: " + result);
         return result;
@@ -96,12 +98,12 @@ public class StudentController {
     }
 
     @GetMapping("/fieldsOfStudy")
-    public List<FieldOfStudy>getAllFieldsOfStudy(){
+    public List<FieldOfStudy> getAllFieldsOfStudy() {
         return List.of(FieldOfStudy.values());
     }
 
     @PostMapping("/fieldOfStudy")
-    public String getFieldOfStudyContent(final FieldOfStudy fieldOfStudy){
+    public String getFieldOfStudyContent(final FieldOfStudy fieldOfStudy) {
         return fieldOfStudy.toString();
     }
 

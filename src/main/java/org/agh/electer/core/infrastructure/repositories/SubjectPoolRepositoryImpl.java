@@ -2,7 +2,7 @@ package org.agh.electer.core.infrastructure.repositories;
 
 import org.agh.electer.core.domain.subject.Subject;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
-import org.agh.electer.core.domain.student.NoSemester;
+import org.agh.electer.core.domain.subject.pool.NoSemester;
 import org.agh.electer.core.domain.subject.pool.SubjectPool;
 import org.agh.electer.core.domain.subject.pool.SubjectPoolId;
 import org.agh.electer.core.infrastructure.dao.StudentDao;
@@ -43,7 +43,7 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
 
     @Override
     public SubjectPool findByFieldOfStudy(FieldOfStudy fieldOfStudy, NoSemester noSemester, StudiesDegree studiesDegree) {
-        return SubjectPoolMapper.toDomain(subjectPoolDao.findByFieldOfStudyAndNumberOfSemesterAndStudiesDegree(
+        return SubjectPoolMapper.toDomain(subjectPoolDao.findByFieldOfStudyAndNoSemesterAndStudiesDegree(
                 fieldOfStudy,
                 noSemester.getValue(),
                 studiesDegree),null);
