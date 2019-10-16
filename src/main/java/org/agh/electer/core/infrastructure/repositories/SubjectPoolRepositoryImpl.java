@@ -2,11 +2,14 @@ package org.agh.electer.core.infrastructure.repositories;
 
 import org.agh.electer.core.domain.subject.Subject;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
+import org.agh.electer.core.domain.student.NoSemester;
 import org.agh.electer.core.domain.subject.pool.SubjectPool;
 import org.agh.electer.core.domain.subject.pool.SubjectPoolId;
 import org.agh.electer.core.infrastructure.dao.StudentDao;
 import org.agh.electer.core.infrastructure.dao.SubjectChoiceDao;
 import org.agh.electer.core.infrastructure.dao.SubjectPoolDao;
+import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
+import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 import org.agh.electer.core.infrastructure.entities.SubjectPoolEntity;
 import org.agh.electer.core.infrastructure.mappers.SubjectChoiceMapper;
 import org.agh.electer.core.infrastructure.mappers.SubjectMapper;
@@ -39,13 +42,21 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
     }
 
     @Override
+    public SubjectPool findByFieldOfStudy(FieldOfStudy fieldOfStudy, NoSemester noSemester, StudiesDegree studiesDegree) {
+        return SubjectPoolMapper.toDomain(subjectPoolDao.findByFieldOfStudyAndNumberOfSemesterAndStudiesDegree(
+                fieldOfStudy,
+                noSemester.getValue(),
+                studiesDegree),null);
+    }
+
+    @Override
     public void deleteById(SubjectPoolId subjectPoolId) {
         subjectPoolDao.deleteById(subjectPoolId.getValue());
     }
 
     @Override
     public Set<SubjectPool> getAll() {
-        return subjectPoolDao.getAll().stream().map(e->SubjectPoolMapper.toDomain(e, this::selectSubjectChoicesForSubject)).collect(Collectors.toSet());
+        return subjectPoolDao.getAll().stream().map(e -> SubjectPoolMapper.toDomain(e, this::selectSubjectChoicesForSubject)).collect(Collectors.toSet());
     }
 
     @Override
@@ -55,7 +66,7 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
 
     @Override
     public void update(SubjectPool subjectPool) {
-        subjectPoolDao.save(SubjectPoolMapper.toEntity(subjectPool,studentDao::findById));
+        subjectPoolDao.save(SubjectPoolMapper.toEntity(subjectPool, studentDao::findById));
 
     }
 
