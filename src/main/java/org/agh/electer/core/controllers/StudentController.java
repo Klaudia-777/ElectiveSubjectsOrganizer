@@ -78,6 +78,14 @@ public class StudentController {
         return result;
     }
 
+    @PostMapping("/students/{albumNr}/choices")
+    public List<SubjectChoiceDto> showSubjectChoices(@PathVariable String albumNr) {
+        val result = studentRepository.findById(AlbumNumber.of(albumNr))
+                .get().getSubjectChoices().stream().map(SubjectChoiceDTOMapper::toDto).collect(Collectors.toList());
+        log.info(result.toString());
+        return result;
+    }
+
     private boolean checkIfStudentExists(final CredentialsDTO credentials, final Student student) {
         if (credentials.getAverageGrade() == student.getAverageGrade().getValue()
                 && credentials.getName().equals(student.getName().getValue())
