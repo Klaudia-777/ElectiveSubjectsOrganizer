@@ -16,8 +16,8 @@ public class SubjectChoiceMapper {
         val entity = SubjectChoiceEntity.builder()
                 .id(subjectChoice.getId().getValue())
                 .priority(subjectChoice.getPriority().getValue())
-                .studentId(subjectChoice.getId().getValue())
-                .subjectId(studentEntity.getAlbumNumber())
+                .studentId(subjectChoice.getStudentId().getValue())
+                .subjectId(subjectChoice.getSubjectId().getValue())
                 .qualifiedOfNot(subjectChoice.getQualifiedOrNot().isValue())
                 .build();
         return entity;

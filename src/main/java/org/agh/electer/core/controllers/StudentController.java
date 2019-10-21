@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.student.Student;
-import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.domain.subject.pool.NoSemester;
 import org.agh.electer.core.domain.subject.pool.SubjectPool;
@@ -15,8 +14,8 @@ import org.agh.electer.core.dto.SubjectPoolDto;
 import org.agh.electer.core.infrastructure.dtoMappers.SubjectChoiceDTOMapper;
 import org.agh.electer.core.infrastructure.dtoMappers.SubjectPoolDTOMapper;
 import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
-import org.agh.electer.core.infrastructure.mappers.StudentMapper;
 import org.agh.electer.core.infrastructure.repositories.StudentRepository;
+import org.agh.electer.core.infrastructure.repositories.SubjectChoiceRepository;
 import org.agh.electer.core.infrastructure.repositories.SubjectPoolRepository;
 import org.agh.electer.core.service.CsvParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +33,15 @@ public class StudentController {
     private StudentRepository studentRepository;
     private CsvParser csvParser;
     private SubjectPoolRepository subjectPoolRepository;
+    private SubjectChoiceRepository subjectChoiceRepository;
+//    private boolean areChoicesSaved;
 
     @Autowired
-    public StudentController(StudentRepository studentRepository, CsvParser csvParser, SubjectPoolRepository subjectPoolRepository) {
+    public StudentController(StudentRepository studentRepository, CsvParser csvParser, SubjectPoolRepository subjectPoolRepository, SubjectChoiceRepository subjectChoiceRepository) {
         this.studentRepository = studentRepository;
         this.csvParser = csvParser;
         this.subjectPoolRepository = subjectPoolRepository;
+        this.subjectChoiceRepository = subjectChoiceRepository;
     }
 
     @PostMapping("/students")
@@ -48,8 +50,14 @@ public class StudentController {
                 .ifPresent(n -> n.forEach(studentRepository::save));
     }
 
+    @GetMapping("/students/{albumNr}/areChoicesSaved")
+    public boolean areChoicesSaved(@PathVariable String albumNr) {
+        return studentRepository.findById(AlbumNumber.of(albumNr)).get().getSubjectChoices().size() > 0;
+    }
+
     @PostMapping("/students/{albumNr}/saveChoices")
     public void saveSubjectChoices(@RequestBody List<SubjectChoiceDto> priorities, @PathVariable String albumNr) {
+//        if (studentRepository.findById(AlbumNumber.of(albumNr)).get().getSubjectChoices().size() == 0) {
         log.info(albumNr);
         log.info(priorities.get(1).toString());
 
@@ -57,6 +65,7 @@ public class StudentController {
                 .peek(n -> n.setId(SubjectChoiceId.of(UUID.randomUUID().toString()))).collect(Collectors.toList());
 
         Student student = studentRepository.findById(AlbumNumber.of(albumNr)).get();
+        student.getSubjectChoices().forEach(n -> subjectChoiceRepository.delete(n.getId()));
         student.setSubjectChoices(choices);
         studentRepository.update(student);
 
@@ -67,18 +76,21 @@ public class StudentController {
         subjectPoolRepository.update(subjectPool);
 
         log.info(student.getSubjectChoices().toString());
+//        areChoicesSaved=true;
     }
+//    }
 
     @PostMapping("/students/login")
     public boolean login(@RequestBody CredentialsDTO credentialsDTO) {
-        val result = studentRepository.findById(AlbumNumber.of(credentialsDTO.getAlbumNumber()))
+        AlbumNumber albumNumber = AlbumNumber.of(credentialsDTO.getAlbumNumber());
+        val result = studentRepository.findById(albumNumber)
                 .filter(s -> checkIfStudentExists(credentialsDTO, s))
                 .isPresent();
         log.info("Oto wynik: " + result);
         return result;
     }
 
-    @PostMapping("/students/{albumNr}/choices")
+    @GetMapping("/students/{albumNr}/choices")
     public List<SubjectChoiceDto> showSubjectChoices(@PathVariable String albumNr) {
         val result = studentRepository.findById(AlbumNumber.of(albumNr))
                 .get().getSubjectChoices().stream().map(SubjectChoiceDTOMapper::toDto).collect(Collectors.toList());

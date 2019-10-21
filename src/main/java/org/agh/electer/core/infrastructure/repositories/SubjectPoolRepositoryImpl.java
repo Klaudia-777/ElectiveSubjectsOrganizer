@@ -67,7 +67,6 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
     @Override
     public void update(SubjectPool subjectPool) {
         subjectPoolDao.save(SubjectPoolMapper.toEntity(subjectPool, studentDao::findById));
-
     }
 
     @Override

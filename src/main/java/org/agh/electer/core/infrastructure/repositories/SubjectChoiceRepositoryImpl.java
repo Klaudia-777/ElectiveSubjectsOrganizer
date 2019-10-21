@@ -1,5 +1,6 @@
 package org.agh.electer.core.infrastructure.repositories;
 
+import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.infrastructure.dao.SubjectChoiceDao;
@@ -19,5 +20,10 @@ public class SubjectChoiceRepositoryImpl implements SubjectChoiceRepository {
     @Override
     public SubjectChoice findById(SubjectChoiceId subjectChoiceId) {
         return subjectChoiceDao.findById(subjectChoiceId.getValue()).map(SubjectChoiceMapper::toDomain).orElse(null);
+    }
+
+    @Override
+    public void delete(SubjectChoiceId subjectChoiceId) {
+        subjectChoiceDao.deleteById(subjectChoiceId.getValue());
     }
 }

@@ -23,7 +23,7 @@ public class SubjectChoiceDTOMapper {
 
     public static SubjectChoiceDto toDto(final SubjectChoice domain) {
         return SubjectChoiceDto.builder()
-                .id(domain.getSubjectId().getValue())
+                .id(domain.getId().getValue())
                 .priority(domain.getPriority().getValue())
                 .studentId(domain.getStudentId().getValue())
                 .subjectId(domain.getSubjectId().getValue())

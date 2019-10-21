@@ -49,9 +49,8 @@ public class CsvParser {
 
         List<Student> studentList = new ArrayList<>();
         String firstLine = csvReader.readLine();
-
-//        if (firstLine.equals("Nr albumu;Kierunek;Typ studi�w;Nr semestru;Nazwisko;Imi�;Specjalno�;�rednia ocen")) {
-        while ((row = csvReader.readLine()) != null) {
+//        if(firstLine.equals("Nazwisko;Imi«;Nr albumu;Kierunek studi—w;Typ studi—w;Rok studi—w;Nr semestru;Typ semestru;ĺrednia za 2 poprzednie semestry;SpecjalnoćŤ;Starosta")){
+            while ((row = csvReader.readLine()) != null) {
             String[] data = row.split(";");
             val student = Student.builder().build();
             if (studentRepository.findById(AlbumNumber.of(data[ALBUM_NUMBER_COLUMN])).orElse(null) == null) {
@@ -80,10 +79,10 @@ public class CsvParser {
         csvReader.close();
         return studentList;
 
-    }
+//    }
 //        else
 //            return null;
-//    }
+    }
 
     public SubjectPool parseSubjectFile(MultipartFile multipartFile,
                                         SubjectPoolRepository subjectPoolRepository,
@@ -96,7 +95,6 @@ public class CsvParser {
         String firstLine = csvReader.readLine();
 
         if (firstLine.equals("Kierunek;Stopie�;Semestr;Nazwa przedmiotu;Prowadz�cy;Limit")) {
-
             subjectPool.setId(SubjectPoolId.of(UUID.randomUUID().toString()));
             subjectPool.setStudents(new HashSet<>());
             subjectPool.setElectiveSubjects(new HashSet<>());
