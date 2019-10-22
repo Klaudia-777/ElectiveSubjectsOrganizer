@@ -3,7 +3,9 @@ package org.agh.electer.core.service;
 import lombok.val;
 import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.student.Student;
+import org.agh.electer.core.domain.subject.NoPlaces;
 import org.agh.electer.core.domain.subject.Subject;
+import org.agh.electer.core.domain.subject.choice.Priority;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 import org.agh.electer.core.domain.subject.choice.SubjectChoiceId;
 import org.agh.electer.core.domain.subject.pool.SubjectPool;
@@ -23,7 +25,6 @@ import java.util.stream.Collectors;
 public class ComputingServiceImpl implements ComputingService {
     private final SubjectPoolRepository subjectPoolRepository;
     private final StudentRepository studentRepository;
-    private final SubjectChoiceRepository subjectChoiceRepository;
 
     private Map<AlbumNumber, Student> studentMap;
     private Map<SubjectChoiceId, Optional<SubjectChoice>> subjectChoiceMap;
@@ -32,7 +33,6 @@ public class ComputingServiceImpl implements ComputingService {
     public ComputingServiceImpl(SubjectPoolRepository subjectPoolRepository, StudentRepository studentRepository, SubjectChoiceRepository subjectChoiceRepository) {
         this.subjectPoolRepository = subjectPoolRepository;
         this.studentRepository = studentRepository;
-        this.subjectChoiceRepository = subjectChoiceRepository;
     }
 
     @Override
@@ -40,6 +40,9 @@ public class ComputingServiceImpl implements ComputingService {
         val subjectPool = subjectPoolRepository.findById(subjectPoolId).get();
 
         for (val subject : subjectPool.getElectiveSubjects()) {
+            if(subject.getNumberOfPlaces().getValue()==0){
+                subject.setNumberOfPlaces(NoPlaces.of(Integer.MAX_VALUE));
+            }
             List<AlbumNumber> studentsQualifiedForThisSubject = new ArrayList<>();
 
             studentMap = subjectPoolRepository.selectSubjectChoicesForSubject(subject.getSubjectId().getValue())
@@ -68,14 +71,15 @@ public class ComputingServiceImpl implements ComputingService {
             //poczawszy od indeksu:
             int sinceWhichIndex = 0;
             for (int i = 0; i < subject.getNumberOfPlaces().getValue(); i++) {
-                if (i <= subjectChoicesByPriorityAndAvg.size()) {
+                if (i < subjectChoicesByPriorityAndAvg.size()) {
                     studentsQualifiedForThisSubject.add(subjectChoicesByPriorityAndAvg.get(i).getStudentId());
                 } else {
                     sinceWhichIndex = i;
                     studentMap.values().forEach(student -> student.deleteSubjectChoice(subject.getSubjectId()));
                     break;
                 }
-                studentsQualifiedForThisSubject.clear();
+                subject.setQualifiedStudents(studentsQualifiedForThisSubject);
+//                studentsQualifiedForThisSubject.clear();
             }
 
             for (int i = sinceWhichIndex; i < subjectChoicesByPriorityAndAvg.size(); i++) {
@@ -85,6 +89,7 @@ public class ComputingServiceImpl implements ComputingService {
 
 
         }
+        subjectPoolRepository.update(subjectPool);
     }
 
     private void setRepresentativesChoices(SubjectPool subjectPool,

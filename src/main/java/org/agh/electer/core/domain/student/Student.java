@@ -59,7 +59,7 @@ public class Student {
     private Speciality Speciality;
 
     public void deleteSubjectChoice(final SubjectId id) {
-        subjectChoices.remove(id);
+        subjectChoices=subjectChoices.stream().filter(n->!n.getSubjectId().equals(id)).collect(Collectors.toList());
     }
 
     public void decreasePriority() {

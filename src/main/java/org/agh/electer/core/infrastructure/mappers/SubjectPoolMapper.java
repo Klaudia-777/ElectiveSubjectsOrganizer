@@ -45,6 +45,7 @@ public class SubjectPoolMapper {
                 .tutor(subject.getTutor().getValue())
                 .description(Optional.ofNullable(subject.getDescription()).map(Description::getValue).orElse(null))
                 .subjectPool(Optional.ofNullable(subjectPoolEntity).orElse(null))
+                .qualifiedStudents(subject.getQualifiedStudents().stream().map(AlbumNumber::getValue).collect(Collectors.toList()))
                 .build();
 
         return subjectEntity;
@@ -61,26 +62,26 @@ public class SubjectPoolMapper {
                 .students(s.getStudents().stream().map(StudentEntity::getAlbumNumber).map(AlbumNumber::of).collect(Collectors.toSet()))
                 .electiveSubjects(s.getElectiveSubjects()
                         .stream()
-                        .map(subjectEntity -> toDomain(subjectEntity, subjectChoiceSelector))
+                        .map(subjectEntity -> toDomain(subjectEntity))
                         .collect(Collectors.toSet())
                 ).build();
     }
 
-    private static Subject toDomain(SubjectEntity subjectEntity, final Function<String, List<SubjectChoice>> subjectChoiceSelector) {
+    private static Subject toDomain(SubjectEntity subjectEntity) {
         return Subject.builder()
                 .subjectId(SubjectId.of(subjectEntity.getId()))
                 .subjectName(SubjectName.of(subjectEntity.getName()))
                 .description(Description.of(subjectEntity.getDescription()))
                 .numberOfPlaces(NoPlaces.of(subjectEntity.getNumberOfPlaces()))
                 .tutor(Tutor.of(subjectEntity.getTutor()))
-//                .qualifiedStudents(subjectEntity.getQualifiedStudents()
-//                        .stream()
-//                        .map(StudentMapper::toDomain)
-//                        .collect(Collectors.toList()))
-////                .subjectChoices(subjectEntity.
-//                .stream()
-//                .map(SubjectPoolMapper::toDomain)
-//                .collect(Collectors.toList()))
+                .subjectChoices(subjectEntity.getSubjectChoices()
+                        .stream()
+                        .map(SubjectChoiceMapper::toDomain)
+                        .collect(Collectors.toList()))
+                .qualifiedStudents(subjectEntity.getQualifiedStudents()
+                        .stream()
+                        .map(AlbumNumber::of)
+                        .collect(Collectors.toList()))
                 .build();
     }
 

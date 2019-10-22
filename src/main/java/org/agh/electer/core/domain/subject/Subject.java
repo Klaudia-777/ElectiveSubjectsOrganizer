@@ -2,6 +2,7 @@ package org.agh.electer.core.domain.subject;
 
 import lombok.Builder;
 import lombok.Data;
+import org.agh.electer.core.domain.student.AlbumNumber;
 import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 
@@ -30,8 +31,8 @@ public class Subject {
     private List<SubjectChoice> subjectChoices =new ArrayList<>();
 
     private Description description;
-
-    private List<Student> qualifiedStudents;
+    @Builder.Default
+    private List<AlbumNumber> qualifiedStudents=new ArrayList<>();
 
     public void decreaseNoPlaces() {
         numberOfPlaces = NoPlaces.of(numberOfPlaces.getValue() - 1);

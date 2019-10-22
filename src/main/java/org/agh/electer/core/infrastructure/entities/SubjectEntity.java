@@ -32,7 +32,12 @@ public class SubjectEntity {
     @JoinColumn(name="SUBJECT_POOL")
     private SubjectPoolEntity subjectPool;
 
-//    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-////    @JoinColumn(subjectName = "QUALIFIED_STUDENTS")
-//    private List<StudentEntity> qualifiedStudents;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    @JoinColumn(subjectName = "QUALIFIED_STUDENTS")
+    private List<SubjectChoiceEntity> subjectChoices;
+
+    @ElementCollection
+    @CollectionTable(name="gualifiedStudents", joinColumns=@JoinColumn(name="subjectId"))
+    @Column(name= "QUALIFIED_STUDENTS")
+    private List<String> qualifiedStudents;
 }
