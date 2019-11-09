@@ -1,8 +1,11 @@
 package org.agh.electer.core.controllers;
 
 
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.agh.electer.core.domain.student.Student;
 import org.agh.electer.core.domain.subject.pool.NoSemester;
 import org.agh.electer.core.domain.subject.pool.SubjectPool;
 import org.agh.electer.core.dto.AdminCredentialsDTO;
@@ -15,10 +18,14 @@ import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 import org.agh.electer.core.infrastructure.repositories.StudentRepository;
 import org.agh.electer.core.infrastructure.repositories.SubjectPoolRepository;
 import org.agh.electer.core.service.ComputingService;
+import org.agh.electer.core.service.CsvParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,13 +36,15 @@ public class AdminController {
     private StudentRepository studentRepository;
     private SubjectPoolRepository subjectPoolRepository;
     private ComputingService computingService;
+    private CsvParser csvParser;
 
     @Autowired
-    public AdminController(AdminDao adminDao, StudentRepository studentRepository, SubjectPoolRepository subjectPoolRepository, ComputingService computingService) {
+    public AdminController(AdminDao adminDao, StudentRepository studentRepository, SubjectPoolRepository subjectPoolRepository, ComputingService computingService, CsvParser csvParser) {
         this.adminDao = adminDao;
         this.studentRepository = studentRepository;
         this.subjectPoolRepository = subjectPoolRepository;
         this.computingService = computingService;
+        this.csvParser = csvParser;
     }
 
     @PostMapping("/admin/login")
@@ -56,11 +65,36 @@ public class AdminController {
         log.info("zapisano");
     }
 
-    @GetMapping("/admin/fieldOfStudyView/{fieldOfStudy}")
-    public List<StudentDto> sendStudentsForThisFOS(@PathVariable String fieldOfStudy) {
+    @GetMapping("/admin/{fieldOfStudy}/{noSem}/{stDegree}/download")
+    public void generate(@PathVariable String fieldOfStudy,
+                         @PathVariable String noSem,
+                         @PathVariable String stDegree,
+                         HttpServletResponse httpServletResponse) throws CsvRequiredFieldEmptyException, IOException, CsvDataTypeMismatchException {
+        List<Student> students=studentRepository.findByFieldOfStudy(FieldOfStudy.valueOf(fieldOfStudy),
+                NoSemester.of(Integer.valueOf(noSem)),
+                StudiesDegree.valueOf(stDegree));
+
+        Optional.ofNullable(subjectPoolRepository.findByFieldOfStudy(FieldOfStudy.valueOf(fieldOfStudy),
+                NoSemester.of(Integer.valueOf(noSem)),
+                StudiesDegree.valueOf(stDegree))).ifPresent(subjectPool -> {
+            try {
+                csvParser.generateFile(httpServletResponse, students,subjectPool);
+            } catch (IOException | CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {
+                e.printStackTrace();
+            }
+        });
+
+        ;
+        log.info("pobrano");
+    }
+
+    @GetMapping("/admin/fieldOfStudyView/{fieldOfStudy}/{studiesDegree}/{numberOfSemester}")
+    public List<StudentDto> sendStudentsForThisFOS(@PathVariable String fieldOfStudy,@PathVariable String studiesDegree,@PathVariable String numberOfSemester) {
         List<StudentDto> result = studentRepository.getAll()
                 .stream()
                 .filter(s -> s.getFieldOfStudy().equals(FieldOfStudy.valueOf(fieldOfStudy)))
+                .filter(n->n.getStudiesDegree().equals(StudiesDegree.valueOf(studiesDegree)))
+                .filter(m->m.getNumberOfSemester().getValue()==Integer.valueOf(numberOfSemester))
                 .map(StudentDTOMapper::toDto)
                 .collect(Collectors.toList());
         result.forEach(System.out::println);

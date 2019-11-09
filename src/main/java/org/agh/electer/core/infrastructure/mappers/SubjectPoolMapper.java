@@ -52,7 +52,7 @@ public class SubjectPoolMapper {
     }
 
 
-    public static SubjectPool toDomain(SubjectPoolEntity s, final Function<String, List<SubjectChoice>> subjectChoiceSelector) {
+    public static SubjectPool toDomain(SubjectPoolEntity s) {
         return SubjectPool.builder()
                 .id(SubjectPoolId.of(s.getId()))
                 .fieldOfStudy(s.getFieldOfStudy())
@@ -62,7 +62,7 @@ public class SubjectPoolMapper {
                 .students(s.getStudents().stream().map(StudentEntity::getAlbumNumber).map(AlbumNumber::of).collect(Collectors.toSet()))
                 .electiveSubjects(s.getElectiveSubjects()
                         .stream()
-                        .map(subjectEntity -> toDomain(subjectEntity))
+                        .map(SubjectPoolMapper::toDomain)
                         .collect(Collectors.toSet())
                 ).build();
     }

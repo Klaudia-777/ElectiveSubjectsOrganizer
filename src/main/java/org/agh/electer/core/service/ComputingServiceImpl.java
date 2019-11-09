@@ -39,6 +39,10 @@ public class ComputingServiceImpl implements ComputingService {
     public void compute(SubjectPoolId subjectPoolId) {
         val subjectPool = subjectPoolRepository.findById(subjectPoolId).get();
 
+        val studentList = subjectPool.getStudents().stream().map(studentRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toMap(Student::getAlbumNumber, it->it));
         for (val subject : subjectPool.getElectiveSubjects()) {
             if(subject.getNumberOfPlaces().getValue()==0){
                 subject.setNumberOfPlaces(NoPlaces.of(Integer.MAX_VALUE));
@@ -48,7 +52,7 @@ public class ComputingServiceImpl implements ComputingService {
             studentMap = subjectPoolRepository.selectSubjectChoicesForSubject(subject.getSubjectId().getValue())
                     .stream()
                     .map(SubjectChoice::getStudentId)
-                    .collect(Collectors.toMap(Function.identity(), id -> studentRepository.findById(id).get()));
+                    .collect(Collectors.toMap(Function.identity(), studentList::get));
 
 
             // Lista studentow ktorzy dokonywali wyborow
@@ -61,6 +65,7 @@ public class ComputingServiceImpl implements ComputingService {
             //ustawienie kolejki do przedmiotu
             List<SubjectChoice> subjectChoicesByPriorityAndAvg = studentMap.values()
                     .stream()
+                    .filter(student -> student.getNoQualifiedForSubjects()<subjectPool.getNoSubjectsToAttend().getValue())
                     .map(student -> student.findSubjectChoiceBySubjectId(subject.getSubjectId()))
                     .sorted(compareByPriority()
                             .thenComparing(compareByAgerageGrade()))
@@ -73,6 +78,7 @@ public class ComputingServiceImpl implements ComputingService {
             for (int i = 0; i < subject.getNumberOfPlaces().getValue(); i++) {
                 if (i < subjectChoicesByPriorityAndAvg.size()) {
                     studentsQualifiedForThisSubject.add(subjectChoicesByPriorityAndAvg.get(i).getStudentId());
+                    studentMap.get(subjectChoicesByPriorityAndAvg.get(i).getStudentId()).increaseNoQualiiedFoSubjects();
                 } else {
                     sinceWhichIndex = i;
                     studentMap.values().forEach(student -> student.deleteSubjectChoice(subject.getSubjectId()));

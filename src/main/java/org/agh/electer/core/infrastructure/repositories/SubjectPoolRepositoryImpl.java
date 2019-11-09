@@ -38,15 +38,17 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
     @Override
     public Optional<SubjectPool> findById(SubjectPoolId subjectPoolId) {
         return subjectPoolDao.findById(subjectPoolId.getValue())
-                .map(e -> SubjectPoolMapper.toDomain(e, this::selectSubjectChoicesForSubject));
+                .map(SubjectPoolMapper::toDomain);
     }
 
     @Override
     public SubjectPool findByFieldOfStudy(FieldOfStudy fieldOfStudy, NoSemester noSemester, StudiesDegree studiesDegree) {
-        return SubjectPoolMapper.toDomain(subjectPoolDao.findByFieldOfStudyAndNoSemesterAndStudiesDegree(
+        return Optional.ofNullable(subjectPoolDao.findByFieldOfStudyAndNoSemesterAndStudiesDegree(
                 fieldOfStudy,
                 noSemester.getValue(),
-                studiesDegree),null);
+                studiesDegree)).map(SubjectPoolMapper::toDomain)
+                .orElse(null)
+                ;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
 
     @Override
     public Set<SubjectPool> getAll() {
-        return subjectPoolDao.getAll().stream().map(e -> SubjectPoolMapper.toDomain(e, this::selectSubjectChoicesForSubject)).collect(Collectors.toSet());
+        return subjectPoolDao.getAll().stream().map(SubjectPoolMapper::toDomain).collect(Collectors.toSet());
     }
 
     @Override
@@ -87,4 +89,7 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
                 .map(SubjectChoiceMapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+
+
 }

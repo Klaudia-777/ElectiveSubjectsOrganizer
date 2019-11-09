@@ -15,4 +15,6 @@ public interface SubjectPoolRepository extends GenericRepository<SubjectPool, Su
 
     Set<Subject> getAllSubjectsFromPool(SubjectPoolId subjectPoolId);
     List<SubjectChoice> selectSubjectChoicesForSubject(String subjectId);
+
+
 }

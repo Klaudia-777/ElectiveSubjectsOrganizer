@@ -1,26 +1,38 @@
 package org.agh.electer.core.service;
 
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import lombok.val;
 import org.agh.electer.core.domain.student.*;
 import org.agh.electer.core.domain.subject.*;
+import org.agh.electer.core.domain.subject.choice.SubjectChoice;
 import org.agh.electer.core.domain.subject.pool.NoSubjectsToAttend;
 import org.agh.electer.core.domain.subject.pool.SubjectPool;
 import org.agh.electer.core.domain.subject.pool.SubjectPoolId;
+import org.agh.electer.core.dto.StudentDto;
+import org.agh.electer.core.infrastructure.dtoMappers.StudentDTOMapper;
+import org.agh.electer.core.infrastructure.dtoMappers.SubjectChoiceDTOMapper;
 import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
 import org.agh.electer.core.infrastructure.entities.StudentsRole;
 import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 import org.agh.electer.core.infrastructure.entities.TypeOfSemester;
 import org.agh.electer.core.infrastructure.repositories.StudentRepository;
 import org.agh.electer.core.infrastructure.repositories.SubjectPoolRepository;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class CsvParser {
+    private DataToCSVFile dataToCSVFile;
+    private static Map<String, String> subjectsMap = new HashMap<>();
+
     private static final int SURNAME_COLUMN = 0;
     private static final int NAME_COLUMN = 1;
     private static final int ALBUM_NUMBER_COLUMN = 2;
@@ -41,6 +53,10 @@ public class CsvParser {
     private static final int LECTURER_COLUMN = 4;
     private static final int NO_PLACES_COLUMN = 5;
 
+    public CsvParser(DataToCSVFile dataToCSVFile) {
+        this.dataToCSVFile = dataToCSVFile;
+    }
+
     public List<Student> parseStudentFile(MultipartFile multipartFile,
                                           StudentRepository studentRepository) throws IOException {
         InputStream is = multipartFile.getInputStream();
@@ -50,7 +66,7 @@ public class CsvParser {
         List<Student> studentList = new ArrayList<>();
         String firstLine = csvReader.readLine();
 //        if(firstLine.equals("Nazwisko;Imi«;Nr albumu;Kierunek studi—w;Typ studi—w;Rok studi—w;Nr semestru;Typ semestru;ĺrednia za 2 poprzednie semestry;SpecjalnoćŤ;Starosta")){
-            while ((row = csvReader.readLine()) != null) {
+        while ((row = csvReader.readLine()) != null) {
             String[] data = row.split(";");
             val student = Student.builder().build();
             if (studentRepository.findById(AlbumNumber.of(data[ALBUM_NUMBER_COLUMN])).orElse(null) == null) {
@@ -114,7 +130,7 @@ public class CsvParser {
 
             }
             subjectPool.setElectiveSubjects(subjectSet);
-            subjectPool.setNoSubjectsToAttend(NoSubjectsToAttend.of(subjectSet.size()));
+            subjectPool.setNoSubjectsToAttend(NoSubjectsToAttend.of(6));
 
             csvReader.close();
             return subjectPool;
@@ -137,4 +153,78 @@ public class CsvParser {
         subjectPool.setStudiesDegree(studiesDegree);
         subjectPool.setStudents(studentsForThisSubjectPool);
     }
+
+    public void generateFile(HttpServletResponse response, List<Student> students, SubjectPool subjectPool) throws IOException,
+            CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
+
+        String filename = "Zapisy.csv";
+        File file = new File(filename);
+        val writer = response.getWriter();
+        List<String> headersForFile = fillHeaders(subjectPool);
+
+        writer.write(headersForFile.stream().collect(Collectors.joining(";", "", "\n")));
+
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + filename + "\"");
+
+        students.stream()
+                .map(StudentDTOMapper::toDto)
+                .map(studentDto -> toCSVData(studentDto, subjectPool))
+                .forEach(writer::write);
+
+
+    }
+
+    private List<String> fillHeaders(SubjectPool subjectPool) {
+        val subjectNames = getSubjectNames(subjectPool);
+        val subjectHeaders = String.join(";", subjectNames);
+//        setSubjectMap(subjectPool, subjectNames);
+        return Stream.of("NR ALBUMU", "IMIĘ", "NAZWISKO", "KIERUNEK", "SEMESTR", "STOPIEŃ", "ŚREDNIA OCEN", subjectHeaders).collect(Collectors.toList());
+    }
+
+    private List<String> getSubjectNames(SubjectPool subjectPool) {
+        return subjectPool.getElectiveSubjects()
+                .stream()
+                .map(u -> u.getSubjectName().getValue())
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+//    private void setSubjectMap(SubjectPool subjectPool, List<String> subjectNames) {
+//        Set<Subject> subjectObjects = subjectPool.getElectiveSubjects();
+//
+//        for (val subject : subjectObjects) {
+//            for (String subjectName : subjectNames) {
+//                if (subjectName.equals(subject.getSubjectName().getValue())) {
+//                    subjectsMap.put(subject.getSubjectName().getValue(), subject.getSubjectId().getValue());
+//                }
+//            }
+//        }
+//    }
+
+    private Map<String, Boolean> qualifiedOrNotForStudent(StudentDto studentDto, SubjectPool subjectPool) {
+        return subjectPool.getElectiveSubjects().stream()
+                .collect(Collectors.toMap(s -> s.getSubjectName().getValue(),
+                        subject -> subject.getQualifiedStudents().contains(AlbumNumber.of(studentDto.getAlbumNumber()))));
+    }
+
+    private String toCSVData(StudentDto studentDto, SubjectPool subjectPool) {
+        val map = qualifiedOrNotForStudent(studentDto, subjectPool);
+        val qualified = getSubjectNames(subjectPool)
+                .stream()
+                .map(map::get)
+                .map(String::valueOf)
+                .collect(Collectors.joining(";")).replace("false", "0").replace("true", "1");
+
+
+        return Stream.of(studentDto.getAlbumNumber(),
+                studentDto.getName(), studentDto.getSurname(),
+                String.valueOf(studentDto.getFieldOfStudy()),
+                String.valueOf(studentDto.getNumberOfSemester()),
+                String.valueOf(studentDto.getStudiesDegree()),
+                studentDto.getAverageGrade().toString().replace(".", ","), qualified
+        ).collect(Collectors.joining(";", "", "\n"));
+    }
+
 }

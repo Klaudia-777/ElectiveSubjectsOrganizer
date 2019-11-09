@@ -1,5 +1,6 @@
 package org.agh.electer.core.domain.student;
 
+import com.opencsv.bean.CsvBindByPosition;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 

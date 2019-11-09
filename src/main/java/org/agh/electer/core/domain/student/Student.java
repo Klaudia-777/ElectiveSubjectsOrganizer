@@ -1,5 +1,6 @@
 package org.agh.electer.core.domain.student;
 
+import com.opencsv.bean.CsvBindByPosition;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @Data
 @Builder
 public class Student {
+
     @NotNull
     private AlbumNumber albumNumber;
 
@@ -51,6 +53,9 @@ public class Student {
     private YearOfStudies year;
 
     @NotNull
+    private int noQualifiedForSubjects;
+
+    @NotNull
     @Builder.Default
     private List<SubjectChoice> subjectChoices = new ArrayList<>();
 
@@ -64,6 +69,9 @@ public class Student {
 
     public void decreasePriority() {
         subjectChoices.forEach(s -> s.setPriority(Priority.of(s.getPriority().getValue() - 1)));
+    }
+    public void increaseNoQualiiedFoSubjects() {
+        noQualifiedForSubjects+=1;
     }
 
     public SubjectChoice findSubjectChoiceBySubjectId(SubjectId subjectId) {
