@@ -60,7 +60,7 @@ public class CsvParser {
     public List<Student> parseStudentFile(MultipartFile multipartFile,
                                           StudentRepository studentRepository) throws IOException {
         InputStream is = multipartFile.getInputStream();
-        BufferedReader csvReader = new BufferedReader(new InputStreamReader(is));
+        BufferedReader csvReader = new BufferedReader(new InputStreamReader(is,"Windows-1250"));
         String row;
 
         List<Student> studentList = new ArrayList<>();
@@ -104,13 +104,13 @@ public class CsvParser {
                                         SubjectPoolRepository subjectPoolRepository,
                                         StudentRepository studentRepository) throws IOException {
         InputStream is = multipartFile.getInputStream();
-        BufferedReader csvReader = new BufferedReader(new InputStreamReader(is));
+        BufferedReader csvReader = new BufferedReader(new InputStreamReader(is,"Windows-1250"));
         String row;
         SubjectPool subjectPool = SubjectPool.builder().build();
         Set<Subject> subjectSet = new HashSet<>();
         String firstLine = csvReader.readLine();
 
-        if (firstLine.equals("Kierunek;Stopie�;Semestr;Nazwa przedmiotu;Prowadz�cy;Limit")) {
+        if (firstLine.equals("Kierunek;Stopień;Semestr;Nazwa przedmiotu;Prowadzący;Limit")) {
             subjectPool.setId(SubjectPoolId.of(UUID.randomUUID().toString()));
             subjectPool.setStudents(new HashSet<>());
             subjectPool.setElectiveSubjects(new HashSet<>());

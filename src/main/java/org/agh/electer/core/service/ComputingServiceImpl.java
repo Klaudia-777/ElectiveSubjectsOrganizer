@@ -21,6 +21,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
+
 @Service
 public class ComputingServiceImpl implements ComputingService {
     private final SubjectPoolRepository subjectPoolRepository;
@@ -43,7 +45,8 @@ public class ComputingServiceImpl implements ComputingService {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toMap(Student::getAlbumNumber, it->it));
-        for (val subject : subjectPool.getElectiveSubjects()) {
+        val subjects=subjectPool.getElectiveSubjects().stream().sorted(compareByNoPrioritiesSorted()).collect(Collectors.toList());
+        for (val subject : subjects) {
             if(subject.getNumberOfPlaces().getValue()==0){
                 subject.setNumberOfPlaces(NoPlaces.of(Integer.MAX_VALUE));
             }
@@ -132,4 +135,9 @@ public class ComputingServiceImpl implements ComputingService {
     private Comparator<SubjectChoice> compareByAgerageGrade() {
         return Comparator.comparing(s -> studentMap.get(s.getStudentId()).getAverageGrade().getValue());
     }
+
+    private Comparator<Subject> compareByNoPrioritiesSorted() {
+        return Comparator.comparing(Subject::getMostCommonPriority).reversed();
+    }
+
 }
