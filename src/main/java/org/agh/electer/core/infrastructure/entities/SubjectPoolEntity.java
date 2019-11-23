@@ -27,11 +27,11 @@ public class SubjectPoolEntity {
     @Column(name = "STUDIES_DEGREE")
     private StudiesDegree studiesDegree;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "subjectPool")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "subjectPool")
 //    @JoinColumn(name = "SUBJECT_ID")
     private Set<SubjectEntity> electiveSubjects;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<StudentEntity> students;
 
     @Column(name = "NUMBER_OF_SUBJECTS_TO_ATTEND")

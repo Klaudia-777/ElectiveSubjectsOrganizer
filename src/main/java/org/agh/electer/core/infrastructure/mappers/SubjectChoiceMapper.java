@@ -12,7 +12,7 @@ import org.agh.electer.core.infrastructure.entities.SubjectChoiceEntity;
 import org.agh.electer.core.infrastructure.entities.SubjectEntity;
 
 public class SubjectChoiceMapper {
-    public static SubjectChoiceEntity toEntity(final SubjectChoice subjectChoice,final StudentEntity studentEntity){
+    public static SubjectChoiceEntity toEntity(final SubjectChoice subjectChoice){
         val entity = SubjectChoiceEntity.builder()
                 .id(subjectChoice.getId().getValue())
                 .priority(subjectChoice.getPriority().getValue())

@@ -29,8 +29,7 @@ public class StudentMapper {
                 .typeOfSemester(student.getTypeOfSemester())
                 .build();
 
-        val choices = student.getSubjectChoices().stream().map(subjectChoice ->
-                SubjectChoiceMapper.toEntity(subjectChoice, entity)).collect(Collectors.toList());
+        val choices = student.getSubjectChoices().stream().map(SubjectChoiceMapper::toEntity).collect(Collectors.toList());
 
         entity.setSubjectChoices(choices);
         return entity;

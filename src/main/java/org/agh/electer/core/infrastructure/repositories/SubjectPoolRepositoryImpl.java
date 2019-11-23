@@ -38,7 +38,7 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
     @Override
     public Optional<SubjectPool> findById(SubjectPoolId subjectPoolId) {
         return subjectPoolDao.findById(subjectPoolId.getValue())
-                .map(SubjectPoolMapper::toDomain);
+                .map(n->SubjectPoolMapper.toDomain(n,subjectChoiceDao::findBySubjectId));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
         return Optional.ofNullable(subjectPoolDao.findByFieldOfStudyAndNoSemesterAndStudiesDegree(
                 fieldOfStudy,
                 noSemester.getValue(),
-                studiesDegree)).map(SubjectPoolMapper::toDomain)
+                studiesDegree)).map(n->SubjectPoolMapper.toDomain(n,subjectChoiceDao::findBySubjectId))
                 .orElse(null)
                 ;
     }
@@ -58,7 +58,7 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
 
     @Override
     public Set<SubjectPool> getAll() {
-        return subjectPoolDao.getAll().stream().map(SubjectPoolMapper::toDomain).collect(Collectors.toSet());
+        return subjectPoolDao.getAll().stream().map(n->SubjectPoolMapper.toDomain(n,subjectChoiceDao::findBySubjectId)).collect(Collectors.toSet());
     }
 
     @Override
@@ -78,6 +78,7 @@ public class SubjectPoolRepositoryImpl implements SubjectPoolRepository {
                 .get()
                 .stream()
                 .map(SubjectMapper::toDomain)
+                .peek(s->s.setSubjectChoices(selectSubjectChoicesForSubject(s.getSubjectId().getValue()))) //<-----TODO :(
                 .collect(Collectors.toSet());
 
     }

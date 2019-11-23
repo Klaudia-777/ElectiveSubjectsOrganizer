@@ -65,7 +65,7 @@ public class StudentController {
                 .peek(n -> n.setId(SubjectChoiceId.of(UUID.randomUUID().toString()))).collect(Collectors.toList());
 
         Student student = studentRepository.findById(AlbumNumber.of(albumNr)).get();
-        student.getSubjectChoices().forEach(n -> subjectChoiceRepository.delete(n.getId()));
+//        student.getSubjectChoices().forEach(n -> subjectChoiceRepository.delete(n.getId()));
         student.setSubjectChoices(choices);
         studentRepository.update(student);
 

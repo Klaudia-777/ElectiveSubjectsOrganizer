@@ -44,10 +44,11 @@ public class ComputingServiceImpl implements ComputingService {
         val studentList = subjectPool.getStudents().stream().map(studentRepository::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toMap(Student::getAlbumNumber, it->it));
-        val subjects=subjectPool.getElectiveSubjects().stream().sorted(compareByNoPrioritiesSorted()).collect(Collectors.toList());
+                .collect(Collectors.toMap(Student::getAlbumNumber, it -> it));
+        val subjects = subjectPool.getElectiveSubjects().stream().sorted(compareByNoPrioritiesSorted()).collect(Collectors.toList());
         for (val subject : subjects) {
-            if(subject.getNumberOfPlaces().getValue()==0){
+            System.out.println(subject);
+            if (subject.getNumberOfPlaces().getValue() == 0) {
                 subject.setNumberOfPlaces(NoPlaces.of(Integer.MAX_VALUE));
             }
             List<AlbumNumber> studentsQualifiedForThisSubject = new ArrayList<>();
@@ -68,10 +69,12 @@ public class ComputingServiceImpl implements ComputingService {
             //ustawienie kolejki do przedmiotu
             List<SubjectChoice> subjectChoicesByPriorityAndAvg = studentMap.values()
                     .stream()
-                    .filter(student -> student.getNoQualifiedForSubjects()<subjectPool.getNoSubjectsToAttend().getValue())
+                    .filter(student -> student.getNoQualifiedForSubjects() < subjectPool.getNoSubjectsToAttend().getValue())
                     .map(student -> student.findSubjectChoiceBySubjectId(subject.getSubjectId()))
-                    .sorted(compareByPriority()
+                    .sorted(compare()
+                            .thenComparing(compareByPriority())
                             .thenComparing(compareByAgerageGrade()))
+                    .filter(n -> n.getPriority().getValue() <= subjectPool.getNoSubjectsToAttend().getValue())
                     .collect(Collectors.toList());
 
             //wpisanie do przedmiotu zakwalifikowanych osob
@@ -87,9 +90,9 @@ public class ComputingServiceImpl implements ComputingService {
                     studentMap.values().forEach(student -> student.deleteSubjectChoice(subject.getSubjectId()));
                     break;
                 }
-                subject.setQualifiedStudents(studentsQualifiedForThisSubject);
 //                studentsQualifiedForThisSubject.clear();
             }
+            subject.setQualifiedStudents(studentsQualifiedForThisSubject);
 
             for (int i = sinceWhichIndex; i < subjectChoicesByPriorityAndAvg.size(); i++) {
                 val subjectchoice = subjectChoicesByPriorityAndAvg.get(i);
@@ -136,8 +139,12 @@ public class ComputingServiceImpl implements ComputingService {
         return Comparator.comparing(s -> studentMap.get(s.getStudentId()).getAverageGrade().getValue());
     }
 
+    private Comparator<SubjectChoice> compare() {
+        return Comparator.comparing(s -> studentMap.get(s.getStudentId()).getAverageGrade().getValue() + s.getPriority().getValue());
+    }
+
     private Comparator<Subject> compareByNoPrioritiesSorted() {
-        return Comparator.comparing(Subject::getMostCommonPriority).reversed();
+        return Comparator.comparing(Subject::getMostCommonPriority);
     }
 
 }

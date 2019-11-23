@@ -10,6 +10,7 @@ import org.agh.electer.core.domain.subject.pool.NoSubjectsToAttend;
 import org.agh.electer.core.domain.subject.pool.SubjectPool;
 import org.agh.electer.core.domain.subject.pool.SubjectPoolId;
 import org.agh.electer.core.infrastructure.entities.StudentEntity;
+import org.agh.electer.core.infrastructure.entities.SubjectChoiceEntity;
 import org.agh.electer.core.infrastructure.entities.SubjectEntity;
 import org.agh.electer.core.infrastructure.entities.SubjectPoolEntity;
 
@@ -52,7 +53,7 @@ public class SubjectPoolMapper {
     }
 
 
-    public static SubjectPool toDomain(SubjectPoolEntity s) {
+    public static SubjectPool toDomain(SubjectPoolEntity s, Function<String, List<SubjectChoiceEntity>> getSubjectChoice) {
         return SubjectPool.builder()
                 .id(SubjectPoolId.of(s.getId()))
                 .fieldOfStudy(s.getFieldOfStudy())
@@ -62,19 +63,19 @@ public class SubjectPoolMapper {
                 .students(s.getStudents().stream().map(StudentEntity::getAlbumNumber).map(AlbumNumber::of).collect(Collectors.toSet()))
                 .electiveSubjects(s.getElectiveSubjects()
                         .stream()
-                        .map(SubjectPoolMapper::toDomain)
+                        .map(n -> toDomain(n, getSubjectChoice))
                         .collect(Collectors.toSet())
                 ).build();
     }
 
-    private static Subject toDomain(SubjectEntity subjectEntity) {
+    private static Subject toDomain(SubjectEntity subjectEntity, Function<String, List<SubjectChoiceEntity>> getSubjectChoice) {
         return Subject.builder()
                 .subjectId(SubjectId.of(subjectEntity.getId()))
                 .subjectName(SubjectName.of(subjectEntity.getName()))
                 .description(Description.of(subjectEntity.getDescription()))
                 .numberOfPlaces(NoPlaces.of(subjectEntity.getNumberOfPlaces()))
                 .tutor(Tutor.of(subjectEntity.getTutor()))
-                .subjectChoices(subjectEntity.getSubjectChoices()
+                .subjectChoices(getSubjectChoice.apply(subjectEntity.getId())
                         .stream()
                         .map(SubjectChoiceMapper::toDomain)
                         .collect(Collectors.toList()))
