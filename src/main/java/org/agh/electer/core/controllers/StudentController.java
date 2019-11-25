@@ -119,7 +119,7 @@ public class StudentController {
 
     @GetMapping("/fieldsOfStudy")
     public List<FieldOfStudy> getAllFieldsOfStudy() {
-        return List.of(FieldOfStudy.values());
+        return Arrays.asList(FieldOfStudy.values());
     }
 
     @PostMapping("/fieldOfStudy")
