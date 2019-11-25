@@ -47,43 +47,43 @@ public class InitData {
                 .build();
         adminDao.save(adminEntity);
 
-        val subjectPool = subjectPoolRepository.findById(SubjectPoolId.of("7202e974-6744-4421-9cbc-8ea38fe20e90")).get();
-
-        val subjectList = subjectPool.getElectiveSubjects().stream()
-                .map(Subject::getSubjectId)
-                .map(SubjectId::getValue)
-                .collect(Collectors.toList());
-
-//        subjectList.stream().map(subjectPoolRepository::selectSubjectChoicesForSubject)
-//                .flatMap(Collection::stream).map(SubjectChoiceMapper::toEntity).forEach(subjectChoiceDao::delete);
-
-        val students = subjectPool.getStudents().stream()
-                .map(AlbumNumber::getValue)
-                .collect(Collectors.toList());
-
-        val priorities = Stream.iterate(1, integer -> integer + 1).limit(subjectList.size()).collect(Collectors.toList());
-
-        Map<String, List<SubjectChoiceDto>> studentsChoices = new HashMap<>();
-        for (val student : students) {
-            Collections.shuffle(priorities);
-            studentsChoices.put(student, new ArrayList<>());
-            for (int i = 0; i < subjectList.size(); i++) {
-                studentsChoices.get(student).add(setSubjectChoicesOnStartCustomFunction(student, subjectList.get(i), priorities.get(i)));
-            }
-        }
-        studentsChoices.forEach((key, value) -> studentController.saveSubjectChoices(value, key));
-    }
-
-    public SubjectChoiceDto setSubjectChoicesOnStartCustomFunction(String studentId,
-                                                                   String subjectId,
-                                                                   int priority) {
-
-        return SubjectChoiceDto.builder()
-                .studentId(studentId)
-                .subjectId(subjectId)
-                .priority(priority)
-                .build();
-
+//        val subjectPool = subjectPoolRepository.findById(SubjectPoolId.of("7202e974-6744-4421-9cbc-8ea38fe20e90")).get();
+//
+//        val subjectList = subjectPool.getElectiveSubjects().stream()
+//                .map(Subject::getSubjectId)
+//                .map(SubjectId::getValue)
+//                .collect(Collectors.toList());
+//
+////        subjectList.stream().map(subjectPoolRepository::selectSubjectChoicesForSubject)
+////                .flatMap(Collection::stream).map(SubjectChoiceMapper::toEntity).forEach(subjectChoiceDao::delete);
+//
+//        val students = subjectPool.getStudents().stream()
+//                .map(AlbumNumber::getValue)
+//                .collect(Collectors.toList());
+//
+//        val priorities = Stream.iterate(1, integer -> integer + 1).limit(subjectList.size()).collect(Collectors.toList());
+//
+//        Map<String, List<SubjectChoiceDto>> studentsChoices = new HashMap<>();
+//        for (val student : students) {
+//            Collections.shuffle(priorities);
+//            studentsChoices.put(student, new ArrayList<>());
+//            for (int i = 0; i < subjectList.size(); i++) {
+//                studentsChoices.get(student).add(setSubjectChoicesOnStartCustomFunction(student, subjectList.get(i), priorities.get(i)));
+//            }
+//        }
+//        studentsChoices.forEach((key, value) -> studentController.saveSubjectChoices(value, key));
+//    }
+//
+//    public SubjectChoiceDto setSubjectChoicesOnStartCustomFunction(String studentId,
+//                                                                   String subjectId,
+//                                                                   int priority) {
+//
+//        return SubjectChoiceDto.builder()
+//                .studentId(studentId)
+//                .subjectId(subjectId)
+//                .priority(priority)
+//                .build();
+//
     }
 
 }

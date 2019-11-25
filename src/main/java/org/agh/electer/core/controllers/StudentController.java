@@ -57,7 +57,7 @@ public class StudentController {
 
     @PostMapping("/students/{albumNr}/saveChoices")
     public void saveSubjectChoices(@RequestBody List<SubjectChoiceDto> priorities, @PathVariable String albumNr) {
-//        if (studentRepository.findById(AlbumNumber.of(albumNr)).get().getSubjectChoices().size() == 0) {
+        if (studentRepository.findById(AlbumNumber.of(albumNr)).get().getSubjectChoices().size() == 0) {
         log.info(albumNr);
         log.info(priorities.get(1).toString());
 
@@ -65,7 +65,7 @@ public class StudentController {
                 .peek(n -> n.setId(SubjectChoiceId.of(UUID.randomUUID().toString()))).collect(Collectors.toList());
 
         Student student = studentRepository.findById(AlbumNumber.of(albumNr)).get();
-//        student.getSubjectChoices().forEach(n -> subjectChoiceRepository.delete(n.getId()));
+        student.getSubjectChoices().forEach(n -> subjectChoiceRepository.delete(n.getId()));
         student.setSubjectChoices(choices);
         studentRepository.update(student);
 
@@ -78,7 +78,7 @@ public class StudentController {
         log.info(student.getSubjectChoices().toString());
 //        areChoicesSaved=true;
     }
-//    }
+    }
 
     @PostMapping("/students/login")
     public boolean login(@RequestBody CredentialsDTO credentialsDTO) {
