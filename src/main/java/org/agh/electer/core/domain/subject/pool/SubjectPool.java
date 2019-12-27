@@ -30,4 +30,6 @@ public class SubjectPool {
 
     @NotNull
     private Set<AlbumNumber> students;
+    private String date;
+
 }

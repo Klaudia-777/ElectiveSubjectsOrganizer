@@ -20,6 +20,7 @@ public class SubjectPoolDTOMapper {
     public static SubjectPool toDomain(final SubjectPoolDto dto) {
         val domain = SubjectPool.builder()
                 .id(SubjectPoolId.of(dto.getId()))
+                .date(dto.getDate())
                 .fieldOfStudy(dto.getFieldOfStudy())
                 .noSemester(NoSemester.of(dto.getNoSemester()))
                 .studiesDegree(dto.getStudiesDegree())
@@ -42,6 +43,7 @@ public class SubjectPoolDTOMapper {
     public static SubjectPoolDto toDto(final SubjectPool domain) {
         val dto = SubjectPoolDto.builder()
                 .id(domain.getId().getValue())
+                .date(domain.getDate())
                 .fieldOfStudy(domain.getFieldOfStudy())
                 .noSemester(domain.getNoSemester().getValue())
                 .studiesDegree(domain.getStudiesDegree())

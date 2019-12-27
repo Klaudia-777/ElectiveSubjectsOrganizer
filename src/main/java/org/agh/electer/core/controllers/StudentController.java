@@ -14,6 +14,7 @@ import org.agh.electer.core.dto.SubjectPoolDto;
 import org.agh.electer.core.infrastructure.dtoMappers.SubjectChoiceDTOMapper;
 import org.agh.electer.core.infrastructure.dtoMappers.SubjectPoolDTOMapper;
 import org.agh.electer.core.infrastructure.entities.FieldOfStudy;
+import org.agh.electer.core.infrastructure.entities.StudiesDegree;
 import org.agh.electer.core.infrastructure.repositories.StudentRepository;
 import org.agh.electer.core.infrastructure.repositories.SubjectChoiceRepository;
 import org.agh.electer.core.infrastructure.repositories.SubjectPoolRepository;
@@ -37,7 +38,10 @@ public class StudentController {
 //    private boolean areChoicesSaved;
 
     @Autowired
-    public StudentController(StudentRepository studentRepository, CsvParser csvParser, SubjectPoolRepository subjectPoolRepository, SubjectChoiceRepository subjectChoiceRepository) {
+    public StudentController(StudentRepository studentRepository,
+                             CsvParser csvParser,
+                             SubjectPoolRepository subjectPoolRepository,
+                             SubjectChoiceRepository subjectChoiceRepository) {
         this.studentRepository = studentRepository;
         this.csvParser = csvParser;
         this.subjectPoolRepository = subjectPoolRepository;
@@ -53,6 +57,14 @@ public class StudentController {
     @GetMapping("/students/{albumNr}/areChoicesSaved")
     public boolean areChoicesSaved(@PathVariable String albumNr) {
         return studentRepository.findById(AlbumNumber.of(albumNr)).get().getSubjectChoices().size() > 0;
+    }
+    @GetMapping("/student/{fieldOfStudy}/{numberOfSemester}/{studiesDegree}/getDate")
+    public String getDate(@PathVariable String fieldOfStudy, @PathVariable String numberOfSemester, @PathVariable String studiesDegree) {
+        String date= subjectPoolRepository.findByFieldOfStudy(FieldOfStudy.valueOf(fieldOfStudy),
+                NoSemester.of(Integer.valueOf(numberOfSemester)),
+                StudiesDegree.valueOf(studiesDegree)).getDate();
+        System.out.println(date);
+        return date;
     }
 
     @PostMapping("/students/{albumNr}/saveChoices")

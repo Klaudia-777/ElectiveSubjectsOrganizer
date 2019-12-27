@@ -16,6 +16,9 @@ public class SubjectPoolEntity {
     @Column(name="SUBJECT_SET_ID")
     private String id;
 
+    @Column(name="DATE")
+    private String date;
+
     @Column(name = "FIELD_OF_STUDY")
     @Enumerated(value = EnumType.STRING)
     private FieldOfStudy fieldOfStudy;

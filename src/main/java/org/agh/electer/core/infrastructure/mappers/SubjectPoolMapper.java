@@ -24,6 +24,7 @@ public class SubjectPoolMapper {
     public SubjectPoolEntity toEntity(final SubjectPool subjectPool, Function<String, Optional<StudentEntity>> findById) {
         val entity = SubjectPoolEntity.builder()
                 .id(subjectPool.getId().getValue())
+                .date(subjectPool.getDate())
                 .fieldOfStudy(Optional.ofNullable(subjectPool.getFieldOfStudy()).orElse(null))
                 .numberOfSubjectsToAttend(Optional.ofNullable(subjectPool.getNoSubjectsToAttend()).map(NoSubjectsToAttend::getValue).orElse(null))
                 .noSemester(Optional.ofNullable(subjectPool.getNoSemester()).map(NoSemester::getValue).orElse(null))
@@ -56,6 +57,7 @@ public class SubjectPoolMapper {
     public static SubjectPool toDomain(SubjectPoolEntity s, Function<String, List<SubjectChoiceEntity>> getSubjectChoice) {
         return SubjectPool.builder()
                 .id(SubjectPoolId.of(s.getId()))
+                .date(s.getDate())
                 .fieldOfStudy(s.getFieldOfStudy())
                 .noSubjectsToAttend(NoSubjectsToAttend.of(s.getNumberOfSubjectsToAttend()))
                 .noSemester(NoSemester.of(s.getNoSemester()))

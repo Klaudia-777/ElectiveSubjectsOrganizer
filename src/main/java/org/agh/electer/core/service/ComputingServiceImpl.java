@@ -114,7 +114,7 @@ public class ComputingServiceImpl implements ComputingService {
             // ---> jesli dany student jest starosta...
             if (student.getStudentsRole().equals(StudentsRole.YearGroupRepresentative)) {
 
-                // ---> to jesli wybral ten przedmiot z priorytetem <= liczbie przedmiotow na jakie musi uczeszczac...
+                // ---> i jesli wybral ten przedmiot z priorytetem <= liczbie przedmiotow na jakie musi uczeszczac...
                 if (subjectPool.getNoSubjectsToAttend().getValue() >=
                         student.getSubjectChoicePriority(subject.getSubjectId()).getValue()) {
 
@@ -136,11 +136,13 @@ public class ComputingServiceImpl implements ComputingService {
     }
 
     private Comparator<SubjectChoice> compareByAgerageGrade() {
-        return Comparator.comparing(s -> studentMap.get(s.getStudentId()).getAverageGrade().getValue());
+        return Comparator.comparing(s -> studentMap.get(s.getStudentId())
+                .getAverageGrade().getValue());
     }
 
     private Comparator<SubjectChoice> compare() {
-        return Comparator.comparing(s -> studentMap.get(s.getStudentId()).getAverageGrade().getValue() + s.getPriority().getValue());
+        return Comparator.comparing(s -> studentMap.get(s.getStudentId())
+                .getAverageGrade().getValue() + s.getPriority().getValue());
     }
 
     private Comparator<Subject> compareByNoPrioritiesSorted() {

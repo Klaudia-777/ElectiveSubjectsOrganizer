@@ -15,6 +15,7 @@ import org.agh.electer.core.dto.ChangedLimitsDTO;
 import org.agh.electer.core.dto.StudentDto;
 import org.agh.electer.core.dto.SubjectDto;
 import org.agh.electer.core.infrastructure.dao.AdminDao;
+import org.agh.electer.core.infrastructure.dao.SubjectPoolDao;
 import org.agh.electer.core.infrastructure.dtoMappers.StudentDTOMapper;
 import org.agh.electer.core.infrastructure.dtoMappers.SubjectDTOMapper;
 import org.agh.electer.core.infrastructure.entities.AdminEntity;
@@ -62,6 +63,23 @@ public class AdminController {
         return result;
     }
 
+    @PostMapping("/admin/{fieldOfStudy}/{noSem}/{stDegree}/date")
+    public void setDate(@PathVariable String fieldOfStudy, @PathVariable String noSem, @PathVariable String stDegree, @RequestBody String date) {
+        SubjectPool subjectPool = subjectPoolRepository.findByFieldOfStudy(FieldOfStudy.valueOf(fieldOfStudy),
+                NoSemester.of(Integer.valueOf(noSem)),
+                StudiesDegree.valueOf(stDegree));
+        date = date.substring(0, date.length() - 1);
+        subjectPool.setDate(date);
+        subjectPoolRepository.save(subjectPool);
+        log.info("Data " + date);
+    }
+    @GetMapping("/admin/{fieldOfStudy}/{noSem}/{stDegree}/getDate")
+    public String getDate(@PathVariable String fieldOfStudy, @PathVariable String noSem, @PathVariable String stDegree) {
+        return subjectPoolRepository.findByFieldOfStudy(FieldOfStudy.valueOf(fieldOfStudy),
+                NoSemester.of(Integer.valueOf(noSem)),
+                StudiesDegree.valueOf(stDegree)).getDate();
+    }
+
     @PostMapping("/admin/{fieldOfStudy}/{noSem}/{stDegree}/start")
     public void compute(@PathVariable String fieldOfStudy, @PathVariable String noSem, @PathVariable String stDegree) {
         SubjectPool subjectPool = subjectPoolRepository.findByFieldOfStudy(FieldOfStudy.valueOf(fieldOfStudy),
@@ -81,9 +99,9 @@ public class AdminController {
                 .filter(n -> n.getLimit() != null)
                 .collect(Collectors.toMap(l -> SubjectId.of(l.getSubjectId()), l -> NoPlaces.of(l.getLimit())));
 
-        subjectPool.getElectiveSubjects().stream().filter(u->map.containsKey(u.getSubjectId()))
+        subjectPool.getElectiveSubjects().stream().filter(u -> map.containsKey(u.getSubjectId()))
                 .forEach(n -> n.setNumberOfPlaces(map.get(n.getSubjectId())));
-                subjectPoolRepository.update(subjectPool);
+        subjectPoolRepository.update(subjectPool);
     }
 
     @GetMapping("/admin/{fieldOfStudy}/{noSem}/{stDegree}/download")

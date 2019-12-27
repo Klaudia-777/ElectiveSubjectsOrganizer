@@ -41,6 +41,10 @@ public class Subject {
     }
 
     public double getMostCommonPriority(){
-        return subjectChoices.stream().map(SubjectChoice::getPriority).mapToInt(Priority::getValue).average().orElse(0.0);
+        return subjectChoices.stream()
+                .map(SubjectChoice::getPriority)
+                .mapToInt(Priority::getValue).average()
+                .orElse(0.0);
+
     }
 }
